@@ -79,10 +79,11 @@ maxZoom:18
 
 function searchCity(){
 
-let city = document.getElementById("cityInput").value.toLowerCase();
+let city = document.getElementById("cityInput").value.toLowerCase().trim();
 
 if(!cities[city]){
-document.getElementById("msg").innerText = "This place is not in Albania 🇦🇱";
+document.getElementById("msg").innerText =
+"This place is not in Albania 🇦🇱";
 return;
 }
 
@@ -93,22 +94,41 @@ let coords = cities[city];
 map.setView(coords,11);
 L.marker(coords).addTo(map);
 
-fetch(https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric)
-.then(res=>res.json())
-.then(data=>{
+// IMPORTANT FIX: use city + country code
+fetch(https://api.openweathermap.org/data/2.5/weather?q=${city},AL&appid=${API_KEY}&units=metric)
+.then(res => res.json())
+.then(data => {
+
+if(!data || !data.main){
+document.getElementById("msg").innerText =
+"Weather data not found ❌";
+return;
+}
 
 document.getElementById("weatherCard").style.display="block";
 
 document.getElementById("cityName").innerText = city.toUpperCase();
-document.getElementById("temp").innerText = "Temperature: " + data.main.temp + "°C";
-document.getElementById("wind").innerText = "Wind: " + data.wind.speed + " m/s";
-document.getElementById("humidity").innerText = "Humidity: " + data.main.humidity + "%";
-document.getElementById("desc").innerText = data.weather[0].description;
 
+document.getElementById("temp").innerText =
+"Temperature: " + data.main.temp + "°C";
+
+document.getElementById("wind").innerText =
+"Wind: " + data.wind.speed + " m/s";
+
+document.getElementById("humidity").innerText =
+"Humidity: " + data.main.humidity + "%";
+
+document.getElementById("desc").innerText =
+data.weather[0].description;
+
+})
+.catch(err => {
+document.getElementById("msg").innerText =
+"Error loading weather ❌";
+console.log(err);
 });
 
 }
-
 function goMore(){
 localStorage.setItem("city", currentCity);
 window.location.href="city.html";
