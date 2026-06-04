@@ -1,8 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Climaplan Albania</title>
+
+<!-- ✅ Leaflet CSS (must load first) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css"/>
+
+<style>
+body { font-family: Arial; margin:0; background:#eef6ff; text-align:center; }
+header { background:#2d6cdf; color:white; padding:15px; }
+input, button { padding:10px; margin:5px; }
+#map { height:400px; width:95%; margin:10px auto; border-radius:10px; }
+.card { background:white; padding:15px; display:inline-block; margin-top:10px; border-radius:10px; }
+</style>
+</head>
+
+<body>
+
+<header>
+<h2 id="title">Climaplan Albania 🇦🇱</h2>
+<button onclick="setLang('en')">EN 🇬🇧</button>
+<button onclick="setLang('sq')">SQ 🇦🇱</button>
+</header>
+
+<br>
+
+<input id="cityInput" placeholder="Enter Albanian city">
+<button onclick="searchCity()">Search</button>
+
+<p id="msg"></p>
+
+<div id="map"></div>
+
+<div class="card" id="weatherCard" style="display:none;">
+<h3 id="cityName"></h3>
+<p id="temp"></p>
+<p id="wind"></p>
+<p id="humidity"></p>
+<p id="desc"></p>
+
+<button onclick="goCity()">More about city</button>
+</div>
+
+<!-- ✅ Leaflet JS MUST be BEFORE your code -->
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+
 const API_KEY = "9de43a81fe7ad37cf116c9b9defe5826";
 
-let lang = "en";
 let currentCity = "";
+let lang = "en";
 
+// 🇦🇱 Only Albanian cities
 const cities = {
 "tirana":[41.3275,19.8189],
 "durres":[41.3246,19.4569],
@@ -13,12 +64,21 @@ const cities = {
 "gjirokaster":[40.0758,19.1389]
 };
 
+// 🗺️ Map init (NOW SAFE because Leaflet is loaded first)
+let map = L.map('map').setView([41.3275,19.8189], 8);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+maxZoom: 18
+}).addTo(map);
+
+// 🌐 Language
 function setLang(l){
 lang = l;
 document.getElementById("title").innerText =
 l==="en" ? "Climaplan Albania 🇦🇱" : "Climaplan Shqipëri 🇦🇱";
 }
 
+// 🔎 Search city
 function searchCity(){
 
 let city = document.getElementById("cityInput").value.toLowerCase().trim();
@@ -31,37 +91,41 @@ return;
 
 currentCity = city;
 
+// 📍 Map update
+map.setView(cities[city], 11);
+L.marker(cities[city]).addTo(map);
+
+// 🌤️ Weather API
 fetch(https://api.openweathermap.org/data/2.5/weather?q=${city},AL&appid=${API_KEY}&units=metric)
-.then(res=>res.json())
-.then(data=>{
+.then(res => res.json())
+.then(data => {
 
 if(!data.main){
-document.getElementById("msg").innerText =
-"Weather not available ❌";
+document.getElementById("msg").innerText = "Weather error ❌";
 return;
 }
 
 document.getElementById("weatherCard").style.display="block";
 
-document.getElementById("cityName").innerText = city;
+document.getElementById("cityName").innerText = city.toUpperCase();
+document.getElementById("temp").innerText = "🌡️ " + data.main.temp + "°C";
+document.getElementById("wind").innerText = "🌬️ " + data.wind.speed + " m/s";
+document.getElementById("humidity").innerText = "💧 " + data.main.humidity + "%";
+document.getElementById("desc").innerText = "🌤️ " + data.weather[0].description;
 
-document.getElementById("temp").innerText =
-"🌡️ " + data.main.temp + "°C";
-
-document.getElementById("wind").innerText =
-"🌬️ " + data.wind.speed + " m/s";
-
-document.getElementById("humidity").innerText =
-"💧 " + data.main.humidity + "%";
-
-document.getElementById("desc").innerText =
-"🌤️ " + data.weather[0].description;
-
+})
+.catch(err=>{
+document.getElementById("msg").innerText = "Connection error ❌";
 });
-
 }
 
+// 📄 Go to city page
 function goCity(){
 localStorage.setItem("city", currentCity);
 window.location.href="city.html";
 }
+
+</script>
+
+</body>
+</html>
