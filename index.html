@@ -4,125 +4,126 @@
 <meta charset="UTF-8">
 <title>Climaplan Albania</title>
 
-<!-- ✅ Leaflet CSS (must load first) -->
+<!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css"/>
 
 <style>
-body { font-family: Arial; margin:0; background:#eef6ff; text-align:center; }
-header { background:#2d6cdf; color:white; padding:15px; }
-input, button { padding:10px; margin:5px; }
-#map { height:400px; width:95%; margin:10px auto; border-radius:10px; }
-.card { background:white; padding:15px; display:inline-block; margin-top:10px; border-radius:10px; }
+body {
+    font-family: Arial;
+    margin: 0;
+    text-align: center;
+    background: #eef6ff;
+}
+
+header {
+    background: #2d6cdf;
+    color: white;
+    padding: 15px;
+}
+
+input, button {
+    padding: 10px;
+    margin: 5px;
+    font-size: 16px;
+}
+
+#map {
+    height: 450px;
+    width: 95%;
+    margin: auto;
+    border-radius: 10px;
+}
+
+.card {
+    background: white;
+    padding: 10px;
+    margin-top: 10px;
+    display: inline-block;
+    border-radius: 10px;
+}
 </style>
 </head>
 
 <body>
 
 <header>
-<h2 id="title">Climaplan Albania 🇦🇱</h2>
-<button onclick="setLang('en')">EN 🇬🇧</button>
-<button onclick="setLang('sq')">SQ 🇦🇱</button>
+<h2>Climaplan Albania 🇦🇱</h2>
 </header>
 
 <br>
 
-<input id="cityInput" placeholder="Enter Albanian city">
+<input id="cityInput" placeholder="Enter Albanian city (tirana, vlore...)">
 <button onclick="searchCity()">Search</button>
 
 <p id="msg"></p>
 
 <div id="map"></div>
 
-<div class="card" id="weatherCard" style="display:none;">
+<div class="card" id="infoCard" style="display:none;">
 <h3 id="cityName"></h3>
-<p id="temp"></p>
-<p id="wind"></p>
-<p id="humidity"></p>
-<p id="desc"></p>
-
-<button onclick="goCity()">More about city</button>
+<p id="coords"></p>
 </div>
 
-<!-- ✅ Leaflet JS MUST be BEFORE your code -->
+<!-- Leaflet JS -->
 <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
 
-const API_KEY = "9de43a81fe7ad37cf116c9b9defe5826";
+// 🗺️ Initialize map (must be after Leaflet loads)
+var map = L.map('map').setView([41.3275, 19.8189], 8);
 
-let currentCity = "";
-let lang = "en";
+// 🗺️ OpenStreetMap layer
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+}).addTo(map);
 
 // 🇦🇱 Only Albanian cities
 const cities = {
-"tirana":[41.3275,19.8189],
-"durres":[41.3246,19.4569],
-"vlore":[40.4661,19.4914],
-"shkoder":[42.0685,19.5188],
-"berat":[40.7058,19.9522],
-"elbasan":[41.1102,20.0823],
-"gjirokaster":[40.0758,19.1389]
+    "tirana": [41.3275, 19.8189],
+    "durres": [41.3246, 19.4569],
+    "vlore": [40.4661, 19.4914],
+    "shkoder": [42.0685, 19.5188],
+    "berat": [40.7058, 19.9522],
+    "elbasan": [41.1102, 20.0823],
+    "gjirokaster": [40.0758, 20.1389]
 };
 
-// 🗺️ Map init (NOW SAFE because Leaflet is loaded first)
-let map = L.map('map').setView([41.3275,19.8189], 8);
+let currentMarker = null;
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-maxZoom: 18
-}).addTo(map);
+// 🔎 Search function
+function searchCity() {
 
-// 🌐 Language
-function setLang(l){
-lang = l;
-document.getElementById("title").innerText =
-l==="en" ? "Climaplan Albania 🇦🇱" : "Climaplan Shqipëri 🇦🇱";
-}
+    let city = document.getElementById("cityInput").value.toLowerCase().trim();
 
-// 🔎 Search city
-function searchCity(){
+    // ❌ Not Albania
+    if (!cities[city]) {
+        document.getElementById("msg").innerText =
+            "This place is not in Albania 🇦🇱";
+        return;
+    }
 
-let city = document.getElementById("cityInput").value.toLowerCase().trim();
+    let coords = cities[city];
 
-if(!cities[city]){
-document.getElementById("msg").innerText =
-"This place is not in Albania 🇦🇱";
-return;
-}
+    // 🧹 Remove old marker
+    if (currentMarker) {
+        map.removeLayer(currentMarker);
+    }
 
-currentCity = city;
+    // 📍 Add new marker
+    currentMarker = L.marker(coords).addTo(map)
+        .bindPopup(city.toUpperCase())
+        .openPopup();
 
-// 📍 Map update
-map.setView(cities[city], 11);
-L.marker(cities[city]).addTo(map);
+    // 🎯 Move map
+    map.setView(coords, 11);
 
-// 🌤️ Weather API
-fetch(https://api.openweathermap.org/data/2.5/weather?q=${city},AL&appid=${API_KEY}&units=metric)
-.then(res => res.json())
-.then(data => {
+    // 🧾 Show info
+    document.getElementById("infoCard").style.display = "block";
+    document.getElementById("cityName").innerText = city.toUpperCase();
+    document.getElementById("coords").innerText =
+        "Lat: " + coords[0] + " | Lng: " + coords[1];
 
-if(!data.main){
-document.getElementById("msg").innerText = "Weather error ❌";
-return;
-}
-
-document.getElementById("weatherCard").style.display="block";
-
-document.getElementById("cityName").innerText = city.toUpperCase();
-document.getElementById("temp").innerText = "🌡️ " + data.main.temp + "°C";
-document.getElementById("wind").innerText = "🌬️ " + data.wind.speed + " m/s";
-document.getElementById("humidity").innerText = "💧 " + data.main.humidity + "%";
-document.getElementById("desc").innerText = "🌤️ " + data.weather[0].description;
-
-})
-.catch(err=>{
-document.getElementById("msg").innerText = "Connection error ❌";
-});
-}
-
-// 📄 Go to city page
-function goCity(){
-localStorage.setItem("city", currentCity);
-window.location.href="city.html";
+    document.getElementById("msg").innerText = "";
 }
 
 </script>
