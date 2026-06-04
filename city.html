@@ -5,10 +5,10 @@
 <title>City Info</title>
 
 <style>
-body { font-family: Arial; background:#f4f6ff; padding:20px; }
-.card { background:white; padding:20px; border-radius:10px; }
+body { font-family: Arial; background:#f4f6ff; padding:20px; text-align:center; }
+.card { background:white; padding:20px; border-radius:10px; max-width:600px; margin:auto; }
 img { width:100%; border-radius:10px; }
-button { margin:5px; padding:10px; }
+button { padding:10px; margin:5px; }
 </style>
 </head>
 
@@ -31,32 +31,32 @@ button { margin:5px; padding:10px; }
 let city = localStorage.getItem("city");
 let lang = "en";
 
-function setLang(l){
-lang = l;
-loadCity();
-}
-
 const data = {
 tirana:{
 name:"Tirana",
-desc_en:"Capital of Albania with modern life and culture.",
-desc_sq:"Kryeqyteti i Shqipërisë me kulturë dhe jetë moderne.",
-food:"Byrek 🥟, Tavë Kosi 🍲",
+en:"Capital of Albania with modern life and culture.",
+sq:"Kryeqyteti i Shqipërisë me jetë moderne dhe kulturë.",
+food:"🥟 Byrek, 🍲 Tavë Kosi",
 fact:"Became capital in 1920",
 visit:"Skanderbeg Square, Dajti Mountain",
 img:"https://upload.wikimedia.org/wikipedia/commons/3/3a/Tirana_skyline.jpg"
 },
 
-berat:{
-name:"Berat",
-desc_en:"UNESCO city known as the city of 1000 windows.",
-desc_sq:"Qytet UNESCO i njohur si qyteti i një mijë dritareve.",
-food:"Traditional Albanian food 🍖",
+durres:{
+name:"Durrës",
+en:"Coastal city with ancient Roman history.",
+sq:"Qytet bregdetar me histori romake.",
+food:"🐟 Seafood, 🍞 Traditional bread",
 fact:"One of the oldest cities in Albania",
-visit:"Berat Castle, Osum River",
-img:"https://upload.wikimedia.org/wikipedia/commons/0/0c/Berat_Albania.jpg"
+visit:"Roman Amphitheatre, Beach",
+img:"https://upload.wikimedia.org/wikipedia/commons/6/6e/Durr%C3%ABs_view.jpg"
 }
 };
+
+function setLang(l){
+lang = l;
+loadCity();
+}
 
 function loadCity(){
 
@@ -67,7 +67,7 @@ document.getElementById("title").innerText = c.name;
 document.getElementById("img").src = c.img;
 
 document.getElementById("desc").innerText =
-lang==="en"?c.desc_en:c.desc_sq;
+(lang==="en") ? c.en : c.sq;
 
 document.getElementById("food").innerText = c.food;
 document.getElementById("fact").innerText = c.fact;
