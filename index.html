@@ -1,6 +1,132 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Climaplan Albania</title>
+
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css"/>
+
+<style>
+body {
+    font-family: Arial;
+    margin: 0;
+    text-align: center;
+    background: #eef6ff;
+}
+
+header {
+    background: #2d6cdf;
+    color: white;
+    padding: 15px;
+}
+
+input, button {
+    padding: 10px;
+    margin: 5px;
+    font-size: 16px;
+}
+
+#map {
+    height: 450px;
+    width: 95%;
+    margin: auto;
+    border-radius: 10px;
+}
+
+.card {
+    background: white;
+    padding: 10px;
+    margin-top: 10px;
+    display: inline-block;
+    border-radius: 10px;
+}
+</style>
+</head>
+
 <body>
-<h1>IT WORKS ✅</h1>
+
+<header>
+<h2>Climaplan Albania 🇦🇱</h2>
+</header>
+
+<br>
+
+<input id="cityInput" placeholder="Enter Albanian city (tirana, vlore...)">
+<button onclick="searchCity()">Search</button>
+
+<p id="msg"></p>
+
+<div id="map"></div>
+
+<div class="card" id="infoCard" style="display:none;">
+<h3 id="cityName"></h3>
+<p id="coords"></p>
+</div>
+
+<!-- Leaflet JS -->
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+
+// 🗺️ Initialize map (must be after Leaflet loads)
+var map = L.map('map').setView([41.3275, 19.8189], 8);
+
+// 🗺️ OpenStreetMap layer
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+}).addTo(map);
+
+// 🇦🇱 Only Albanian cities
+const cities = {
+    "tirana": [41.3275, 19.8189],
+    "durres": [41.3246, 19.4569],
+    "vlore": [40.4661, 19.4914],
+    "shkoder": [42.0685, 19.5188],
+    "berat": [40.7058, 19.9522],
+    "elbasan": [41.1102, 20.0823],
+    "gjirokaster": [40.0758, 20.1389]
+};
+
+let currentMarker = null;
+
+// 🔎 Search function
+function searchCity() {
+
+    let city = document.getElementById("cityInput").value.toLowerCase().trim();
+
+    // ❌ Not Albania
+    if (!cities[city]) {
+        document.getElementById("msg").innerText =
+            "This place is not in Albania 🇦🇱";
+        return;
+    }
+
+    let coords = cities[city];
+
+    // 🧹 Remove old marker
+    if (currentMarker) {
+        map.removeLayer(currentMarker);
+    }
+
+    // 📍 Add new marker
+    currentMarker = L.marker(coords).addTo(map)
+        .bindPopup(city.toUpperCase())
+        .openPopup();
+
+    // 🎯 Move map
+    map.setView(coords, 11);
+
+    // 🧾 Show info
+    document.getElementById("infoCard").style.display = "block";
+    document.getElementById("cityName").innerText = city.toUpperCase();
+    document.getElementById("coords").innerText =
+        "Lat: " + coords[0] + " | Lng: " + coords[1];
+
+    document.getElementById("msg").innerText = "";
+}
+
+</script>
+
 </body>
 </html>
