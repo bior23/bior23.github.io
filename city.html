@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>City Info</title>
+
+<style>
+body { font-family: Arial; background:#f4f6ff; padding:20px; }
+.card { background:white; padding:20px; border-radius:10px; }
+img { width:100%; border-radius:10px; }
+button { margin:5px; padding:10px; }
+</style>
+</head>
+
+<body>
+
+<button onclick="setLang('en')">EN 🇬🇧</button>
+<button onclick="setLang('sq')">SQ 🇦🇱</button>
+
+<div class="card">
+<h1 id="title"></h1>
+<img id="img">
+<p id="desc"></p>
+<p id="food"></p>
+<p id="fact"></p>
+<p id="visit"></p>
+</div>
+
+<script>
+
+let city = localStorage.getItem("city");
+let lang = "en";
+
+function setLang(l){
+lang = l;
+loadCity();
+}
+
+const data = {
+tirana:{
+name:"Tirana",
+desc_en:"Capital of Albania with modern life and culture.",
+desc_sq:"Kryeqyteti i Shqipërisë me kulturë dhe jetë moderne.",
+food:"Byrek 🥟, Tavë Kosi 🍲",
+fact:"Became capital in 1920",
+visit:"Skanderbeg Square, Dajti Mountain",
+img:"https://upload.wikimedia.org/wikipedia/commons/3/3a/Tirana_skyline.jpg"
+},
+
+berat:{
+name:"Berat",
+desc_en:"UNESCO city known as the city of 1000 windows.",
+desc_sq:"Qytet UNESCO i njohur si qyteti i një mijë dritareve.",
+food:"Traditional Albanian food 🍖",
+fact:"One of the oldest cities in Albania",
+visit:"Berat Castle, Osum River",
+img:"https://upload.wikimedia.org/wikipedia/commons/0/0c/Berat_Albania.jpg"
+}
+};
+
+function loadCity(){
+
+let c = data[city];
+
+document.getElementById("title").innerText = c.name;
+
+document.getElementById("img").src = c.img;
+
+document.getElementById("desc").innerText =
+lang==="en"?c.desc_en:c.desc_sq;
+
+document.getElementById("food").innerText = c.food;
+document.getElementById("fact").innerText = c.fact;
+document.getElementById("visit").innerText = c.visit;
+}
+
+loadCity();
+
+</script>
+
+</body>
+</html>
