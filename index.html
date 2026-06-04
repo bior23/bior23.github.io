@@ -12,17 +12,16 @@ header { background:#2d6cdf; color:white; padding:20px; text-align:center; }
 
 .container { padding:20px; text-align:center; }
 
-input { padding:10px; width:250px; }
-button { padding:10px; cursor:pointer; margin:5px; }
+input, button { padding:10px; margin:5px; }
 
 #map { height:500px; width:95%; margin:20px auto; border-radius:10px; }
 
 .card {
-margin-top:15px;
 background:white;
 padding:15px;
-border-radius:10px;
+margin-top:15px;
 display:inline-block;
+border-radius:10px;
 }
 </style>
 </head>
@@ -30,25 +29,29 @@ display:inline-block;
 <body>
 
 <header>
-<h1>Climaplan Albania 🇦🇱</h1>
+<h1 id="title">Climaplan Albania 🇦🇱</h1>
+
+<button onclick="setLang('en')">EN 🇬🇧</button>
+<button onclick="setLang('sq')">SQ 🇦🇱</button>
 </header>
 
 <div class="container">
 
 <input id="cityInput" placeholder="Enter Albanian city">
-<button onclick="searchCity()">Search</button>
+<button onclick="searchCity()" id="searchBtn">Search</button>
 
 <p id="msg"></p>
 
 <div id="map"></div>
 
-<div id="weatherCard" class="card" style="display:none;">
-<h3 id="cityName"></h3>
+<div class="card" id="weatherCard" style="display:none;">
+<h2 id="cityName"></h2>
 <p id="temp"></p>
 <p id="wind"></p>
 <p id="humidity"></p>
 <p id="desc"></p>
-<button onclick="goMore()">More about city</button>
+
+<button onclick="goCity()">More about city</button>
 </div>
 
 </div>
@@ -57,7 +60,10 @@ display:inline-block;
 
 <script>
 
-const API_KEY = "5085341330d4a13b0831284275c39384";
+const API_KEY = "9de43a81fe7ad37cf116c9b9defe5826";
+
+let lang = "en";
+let currentCity = "";
 
 const cities = {
 "tirana":[41.3275,19.8189],
@@ -69,13 +75,21 @@ const cities = {
 "gjirokaster":[40.0758,20.1389]
 };
 
-let currentCity = "";
-
 let map = L.map('map').setView([41.3275,19.8189],8);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
 maxZoom:18
 }).addTo(map);
+
+function setLang(l){
+lang = l;
+
+document.getElementById("title").innerText =
+l==="en" ? "Climaplan Albania 🇦🇱" : "Climaplan Shqipëri 🇦🇱";
+
+document.getElementById("searchBtn").innerText =
+l==="en" ? "Search" : "Kërko";
+}
 
 function searchCity(){
 
@@ -83,7 +97,9 @@ let city = document.getElementById("cityInput").value.toLowerCase().trim();
 
 if(!cities[city]){
 document.getElementById("msg").innerText =
-"This place is not in Albania 🇦🇱";
+lang==="en"
+?"This place is not in Albania 🇦🇱"
+:"Ky vend nuk është në Shqipëri 🇦🇱";
 return;
 }
 
@@ -94,14 +110,13 @@ let coords = cities[city];
 map.setView(coords,11);
 L.marker(coords).addTo(map);
 
-// IMPORTANT FIX: use city + country code
 fetch(https://api.openweathermap.org/data/2.5/weather?q=${city},AL&appid=${API_KEY}&units=metric)
-.then(res => res.json())
-.then(data => {
+.then(res=>res.json())
+.then(data=>{
 
-if(!data || !data.main){
+if(!data.main){
 document.getElementById("msg").innerText =
-"Weather data not found ❌";
+"Weather not found";
 return;
 }
 
@@ -110,26 +125,22 @@ document.getElementById("weatherCard").style.display="block";
 document.getElementById("cityName").innerText = city.toUpperCase();
 
 document.getElementById("temp").innerText =
-"Temperature: " + data.main.temp + "°C";
+(lang==="en"?"Temperature: ":"Temperatura: ") + data.main.temp + "°C";
 
 document.getElementById("wind").innerText =
-"Wind: " + data.wind.speed + " m/s";
+(lang==="en"?"Wind: ":"Era: ") + data.wind.speed + " m/s";
 
 document.getElementById("humidity").innerText =
-"Humidity: " + data.main.humidity + "%";
+(lang==="en"?"Humidity: ":"Lagështia: ") + data.main.humidity + "%";
 
 document.getElementById("desc").innerText =
 data.weather[0].description;
 
-})
-.catch(err => {
-document.getElementById("msg").innerText =
-"Error loading weather ❌";
-console.log(err);
 });
 
 }
-function goMore(){
+
+function goCity(){
 localStorage.setItem("city", currentCity);
 window.location.href="city.html";
 }
