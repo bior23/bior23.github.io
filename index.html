@@ -2,190 +2,116 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Climaplan</title>
+<title>Climaplan Albania</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 
 <style>
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial, sans-serif;
-}
+body { font-family: Arial; margin:0; background:#eef6ff; }
+header { background:#2d6cdf; color:white; padding:20px; text-align:center; }
 
-body{
-background:linear-gradient(135deg,#4facfe,#00f2fe);
-min-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-padding:20px;
-}
+.container { padding:20px; text-align:center; }
 
-.container{
+input { padding:10px; width:250px; }
+button { padding:10px; cursor:pointer; margin:5px; }
+
+#map { height:500px; width:95%; margin:20px auto; border-radius:10px; }
+
+.card {
+margin-top:15px;
 background:white;
-width:100%;
-max-width:700px;
-padding:30px;
-border-radius:20px;
-box-shadow:0 10px 30px rgba(0,0,0,0.15);
-text-align:center;
-}
-
-h1{
-font-size:3rem;
-color:#333;
-margin-bottom:10px;
-}
-
-.subtitle{
-color:#666;
-margin-bottom:30px;
-}
-
-.search-box{
-display:flex;
-gap:10px;
-margin-bottom:25px;
-}
-
-input{
-flex:1;
-padding:12px;
-border:2px solid #ddd;
-border-radius:10px;
-font-size:16px;
-}
-
-button{
-padding:12px 20px;
-border:none;
-background:#4facfe;
-color:white;
-border-radius:10px;
-cursor:pointer;
-font-size:16px;
-}
-
-button:hover{
-opacity:0.9;
-}
-
-.weather-card{
-background:#f7f9fc;
-padding:20px;
-border-radius:15px;
-margin-top:20px;
-display:none;
-}
-
-.temp{
-font-size:3rem;
-font-weight:bold;
-color:#333;
-}
-
-.activity{
-margin-top:20px;
 padding:15px;
-background:#e8f7ff;
 border-radius:10px;
-font-size:18px;
-font-weight:bold;
-}
-
-.footer{
-margin-top:25px;
-font-size:14px;
-color:#777;
+display:inline-block;
 }
 </style>
 </head>
 
 <body>
 
+<header>
+<h1>Climaplan Albania 🇦🇱</h1>
+</header>
+
 <div class="container">
 
-<h1>🌤️ Climaplan</h1>
+<input id="cityInput" placeholder="Enter Albanian city">
+<button onclick="searchCity()">Search</button>
 
-<p class="subtitle">
-Plan your activities based on the weather
-</p>
+<p id="msg"></p>
 
-<div class="search-box">
-<input id="cityInput" placeholder="Enter a city">
-<button onclick="generateWeather()">Search</button>
-</div>
+<div id="map"></div>
 
-<div class="weather-card" id="weatherCard">
-<h2 id="cityName"></h2>
-<div class="temp" id="temperature"></div>
-<p id="condition"></p>
-
-<div class="activity" id="activity"></div>
-</div>
-
-<div class="footer">
-Created for DNS & SSL Website Project
+<div id="weatherCard" class="card" style="display:none;">
+<h3 id="cityName"></h3>
+<p id="temp"></p>
+<p id="wind"></p>
+<p id="humidity"></p>
+<p id="desc"></p>
+<button onclick="goMore()">More about city</button>
 </div>
 
 </div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <script>
 
-function generateWeather(){
+const API_KEY = "5085341330d4a13b0831284275c39384";
 
-const city =
-document.getElementById("cityInput").value;
+const cities = {
+"tirana":[41.3275,19.8189],
+"durres":[41.3246,19.4569],
+"vlore":[40.4661,19.4914],
+"shkoder":[42.0685,19.5188],
+"berat":[40.7058,19.9522],
+"elbasan":[41.1102,20.0823],
+"gjirokaster":[40.0758,20.1389]
+};
 
-if(city===""){
-alert("Please enter a city");
+let currentCity = "";
+
+let map = L.map('map').setView([41.3275,19.8189],8);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+maxZoom:18
+}).addTo(map);
+
+function searchCity(){
+
+let city = document.getElementById("cityInput").value.toLowerCase();
+
+if(!cities[city]){
+document.getElementById("msg").innerText = "This place is not in Albania 🇦🇱";
 return;
 }
 
-const weatherTypes = [
-"Sunny",
-"Rainy",
-"Cloudy",
-"Cold"
-];
+currentCity = city;
 
-const selected =
-weatherTypes[Math.floor(Math.random()*weatherTypes.length)];
+let coords = cities[city];
 
-let temp;
-let activity;
+map.setView(coords,11);
+L.marker(coords).addTo(map);
 
-if(selected==="Sunny"){
-temp="28°C";
-activity="☀️ Perfect for hiking, cycling or a picnic!";
-}
-
-if(selected==="Rainy"){
-temp="17°C";
-activity="🌧️ Great day for movies, reading or a cozy café.";
-}
-
-if(selected==="Cloudy"){
-temp="22°C";
-activity="☁️ Nice weather for a walk around town.";
-}
-
-if(selected==="Cold"){
-temp="8°C";
-activity="❄️ Visit a museum or enjoy indoor activities.";
-}
+fetch(https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric)
+.then(res=>res.json())
+.then(data=>{
 
 document.getElementById("weatherCard").style.display="block";
 
-document.getElementById("cityName").innerText=city;
+document.getElementById("cityName").innerText = city.toUpperCase();
+document.getElementById("temp").innerText = "Temperature: " + data.main.temp + "°C";
+document.getElementById("wind").innerText = "Wind: " + data.wind.speed + " m/s";
+document.getElementById("humidity").innerText = "Humidity: " + data.main.humidity + "%";
+document.getElementById("desc").innerText = data.weather[0].description;
 
-document.getElementById("temperature").innerText=temp;
+});
 
-document.getElementById("condition").innerText=selected;
+}
 
-document.getElementById("activity").innerText=activity;
-
+function goMore(){
+localStorage.setItem("city", currentCity);
+window.location.href="city.html";
 }
 
 </script>
