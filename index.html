@@ -10,7 +10,24 @@
 body { font-family: Arial; text-align:center; margin:0; background:#eef6ff; }
 header { background:#2d6cdf; color:white; padding:15px; }
 input, button { padding:10px; margin:5px; }
-#map { height:450px; width:95%; margin:auto; border-radius:10px; }
+
+#map {
+height:450px;
+width:95%;
+margin:auto;
+border-radius:10px;
+}
+
+#infoBox {
+display:none;
+background:white;
+padding:15px;
+margin:15px auto;
+width:90%;
+max-width:500px;
+border-radius:10px;
+text-align:left;
+}
 </style>
 </head>
 
@@ -28,19 +45,20 @@ input, button { padding:10px; margin:5px; }
 <p id="msg"></p>
 
 <div id="map"></div>
-  <div id="weatherBox" style="display:none; background:white; padding:15px; margin:15px auto; width:300px; border-radius:10px;">
-  <h3 id="weatherCity"></h3>
-  <p id="temp"></p>
-  <p id="wind"></p>
-  <p id="weather"></p>
-  <p id="advice"></p>
+
+<!-- 🏙️ CITY INFO BOX -->
+<div id="infoBox">
+<h2 id="cityTitle"></h2>
+<p id="cityDesc"></p>
+<p id="cityFood"></p>
+<p id="cityFact"></p>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
 
-// 🗺️ MAP
+// 🗺️ MAP (YOUR ORIGINAL WORKING VERSION)
 let map = L.map('map').setView([41.3275,19.8189],8);
 
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
@@ -49,7 +67,7 @@ attribution:'OpenStreetMap'
 
 let marker;
 
-// 🟢 ALBANIA COUNTIES (ONLY THESE ARE ALLOWED)
+// 🟢 ALBANIA COUNTIES
 const counties = {
 "tirana":[41.3275,19.8189],
 "durres":[41.3246,19.4569],
@@ -65,54 +83,88 @@ const counties = {
 "vlore":[40.4661,19.4914]
 };
 
-// 🔎 SEARCH FUNCTION (case-insensitive + flexible)
+// 📖 CITY INFO DATA
+const cityInfo = {
+tirana: {
+desc: "The heart of Albania, Tirana County is home to the country’s capital and is known for its vibrant city life, museums, and nightlife.",
+food: "🍲 Traditional food: Tavë Kosi (baked lamb with yogurt).",
+fact: "🎯 Fun fact: Tirana became Albania’s capital in 1920 after the Congress of Lushnjë."
+},
+
+durres: {
+desc: "A coastal county famous for sandy beaches, tourism, and Albania’s largest seaport.",
+food: "🍲 Traditional food: Fresh seafood, especially grilled fish.",
+fact: "🎯 Historical fact: Durrës is one of the oldest cities in Albania, founded around the 7th century BC."
+},
+
+diber: {
+desc: "Known for its mountains, forests, and beautiful natural scenery.",
+food: "🍲 Traditional food: Jufka Dibre (traditional handmade pasta).",
+fact: "🎯 Fun fact: Dibër is home to the highest peak in Albania, Mount Korab."
+},
+
+shkoder: {
+desc: "A region rich in history, culture, and stunning landscapes.",
+food: "🍲 Traditional food: Krap në Tavë (baked carp).",
+fact: "🎯 Historical fact: Shkodër is one of the oldest cities in the Balkans."
+},
+
+elbasan: {
+desc: "Famous for its castle and cultural heritage.",
+food: "🍲 Traditional food: Ballokume cookie.",
+fact: "🎯 Fun fact: Ballokume is made for Summer Day celebrations."
+},
+
+fier: {
+desc: "Known for agriculture and ancient archaeological sites.",
+food: "🍲 Traditional food: Byrek with cheese.",
+fact: "🎯 Historical fact: Apollonia was an important Roman city near Fier."
+},
+
+korce: {
+desc: "Famous for culture and cold winters.",
+food: "🍲 Traditional food: Lakror pie.",
+fact: "🎯 Fun fact: First Albanian school opened here in 1887."
+},
+
+gjirokaster: {
+desc: "Stone city and UNESCO heritage site.",
+food: "🍲 Traditional food: Qifqi rice balls.",
+fact: "🎯 Historical fact: UNESCO World Heritage city."
+},
+
+kukes: {
+desc: "Mountain region with lakes and scenery.",
+food: "🍲 Traditional food: Flija.",
+fact: "🎯 Fun fact: Sheltered refugees during Kosovo War."
+},
+
+lezhe: {
+desc: "Coastal historical region.",
+food: "🍲 Traditional food: Meat casserole.",
+fact: "🎯 Historical fact: Skanderbeg’s memorial is here."
+},
+
+berat: {
+desc: "City of a Thousand Windows.",
+food: "🍲 Traditional food: Pula me Përshesh.",
+fact: "🎯 UNESCO World Heritage Site."
+},
+
+vlore: {
+desc: "Where Albania declared independence in 1912.",
+food: "🍲 Traditional food: Seafood and octopus.",
+fact: "🎯 Historical fact: Independence declared here in 1912."
+}
+};
+
+// 🔎 SEARCH FUNCTION
 function searchCity(){
 
-  function loadWeather(city){
-
-fetch(https://api.openweathermap.org/data/2.5/weather?q=${city},AL&units=metric&appid=${API_KEY})
-.then(response => response.json())
-.then(data => {
-
-if(!data.main){
-return;
-}
-
-let temp = data.main.temp;
-let wind = data.wind.speed;
-let weather = data.weather[0].description;
-
-let advice = "";
-
-if(temp >= 30){
-advice = "🔥 Very hot day — drink water and stay cool.";
-}
-else if(temp >= 22){
-advice = "🌤️ Nice weather for a walk.";
-}
-else if(temp >= 15){
-advice = "🌥️ Mild weather — take a light jacket.";
-}
-else{
-advice = "🧥 Cold weather — dress warmly.";
-}
-
-document.getElementById("weatherBox").style.display = "block";
-document.getElementById("weatherCity").innerText = city.toUpperCase();
-document.getElementById("temp").innerText = "🌡️ Temperature: " + temp + "°C";
-document.getElementById("wind").innerText = "🌬️ Wind: " + wind + " m/s";
-document.getElementById("weather").innerText = "🌤️ Weather: " + weather;
-document.getElementById("advice").innerText = advice;
-
-})
-.catch(error => console.log(error));
-
-}
 let input = document.getElementById("cityInput").value
 .toLowerCase()
 .trim();
 
-// allow partial match + flexible input
 let found = Object.keys(counties).find(c =>
 input.includes(c)
 );
@@ -120,7 +172,7 @@ input.includes(c)
 if(!found){
 document.getElementById("msg").innerText =
 "This place is not in Albania 🇦🇱";
-  loadWeather(found);
+document.getElementById("infoBox").style.display = "none";
 return;
 }
 
@@ -128,17 +180,27 @@ let coords = counties[found];
 
 // 🧹 remove old marker
 if(marker) map.removeLayer(marker);
-  const API_KEY = "9de43a81fe7ad37cf116c9b9defe5826";
 
-// 📍 add marker
+// 📍 new marker
 marker = L.marker(coords).addTo(map)
 .bindPopup(found.toUpperCase())
 .openPopup();
 
 // 🎯 move map
-map.setView(coords, 10);
+map.setView(coords,10);
 
+// clear error
 document.getElementById("msg").innerText = "";
+
+// 📖 SHOW INFO
+let info = cityInfo[found];
+
+document.getElementById("infoBox").style.display = "block";
+
+document.getElementById("cityTitle").innerText = found.toUpperCase();
+document.getElementById("cityDesc").innerText = info.desc;
+document.getElementById("cityFood").innerText = info.food;
+document.getElementById("cityFact").innerText = info.fact;
 
 }
 
