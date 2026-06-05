@@ -10,22 +10,7 @@
 body { font-family: Arial; text-align:center; margin:0; background:#eef6ff; }
 header { background:#2d6cdf; color:white; padding:15px; }
 input, button { padding:10px; margin:5px; }
-
-#map {
-height:450px;
-width:95%;
-margin:auto;
-border-radius:10px;
-}
-
-.card {
-background:white;
-padding:10px;
-margin-top:10px;
-display:inline-block;
-border-radius:10px;
-min-width:250px;
-}
+#map { height:450px; width:95%; margin:auto; border-radius:10px; }
 </style>
 </head>
 
@@ -43,15 +28,6 @@ min-width:250px;
 <p id="msg"></p>
 
 <div id="map"></div>
-
-<!-- WEATHER BOX -->
-<div class="card" id="weatherCard" style="display:none;">
-<h3 id="cityName"></h3>
-<p id="temp"></p>
-<p id="wind"></p>
-<p id="weather"></p>
-<p id="advice"></p>
-</div>
 
 <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
 
@@ -114,79 +90,6 @@ marker = L.marker(coords).addTo(map)
 map.setView(coords, 10);
 
 document.getElementById("msg").innerText = "";
-
-}
-
-
-// 🌤️ WEATHER FUNCTION
-function loadWeather(city){
-
-fetch(https://api.openweathermap.org/data/2.5/weather?q=${city},AL&units=metric&appid=${API_KEY})
-.then(res => res.json())
-.then(data => {
-
-if(!data || !data.main){
-document.getElementById("msg").innerText =
-"Weather not available";
-return;
-}
-
-let temp = data.main.temp;
-let wind = data.wind.speed;
-let weather = data.weather[0].description;
-
-// show box
-document.getElementById("weatherCard").style.display = "block";
-
-document.getElementById("cityName").innerText = city.toUpperCase();
-document.getElementById("temp").innerText = "🌡️ Temp: " + temp + "°C";
-document.getElementById("wind").innerText = "🌬️ Wind: " + wind + " m/s";
-document.getElementById("weather").innerText = "🌤️ " + weather;
-document.getElementById("advice").innerText = getAdvice(temp, wind);
-
-})
-.catch(err=>{
-document.getElementById("msg").innerText =
-"Weather error — map still works ✔️";
-});
-
-}
-
-// 🔎 SEARCH FUNCTION
-function searchCity(){
-
-let input = document.getElementById("cityInput").value
-.toLowerCase()
-.trim();
-
-// match county
-let found = Object.keys(counties).find(c =>
-input.includes(c)
-);
-
-// ❌ NOT ALBANIA
-if(!found){
-document.getElementById("msg").innerText =
-"This place is not an Albania county 🇦🇱";
-return;
-}
-
-let coords = counties[found];
-
-// 📍 MAP UPDATE
-if(marker) map.removeLayer(marker);
-
-marker = L.marker(coords).addTo(map)
-.bindPopup(found.toUpperCase())
-.openPopup();
-
-map.setView(coords,10);
-
-// clear message
-document.getElementById("msg").innerText = "";
-
-// 🌤️ LOAD WEATHER
-loadWeather(found);
 
 }
 
