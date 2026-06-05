@@ -2,31 +2,88 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Climaplan Albania</title>
+<title>Visitor Albania</title>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css"/>
 
 <style>
-body { font-family: Arial; text-align:center; margin:0; background:#eef6ff; }
-header { background:#2d6cdf; color:white; padding:15px; }
-input, button { padding:10px; margin:5px; }
-
-#map {
-height:450px;
-width:95%;
-margin:auto;
-border-radius:10px;
+body {
+font-family: Arial, sans-serif;
+margin: 0;
+background: #f4f7ff;
+text-align: center;
 }
 
-#infoBox {
-display:none;
-background:white;
-padding:15px;
-margin:15px auto;
-width:90%;
-max-width:500px;
-border-radius:10px;
-text-align:left;
+/* HEADER */
+header {
+background: linear-gradient(90deg, #2d6cdf, #4a90e2);
+color: white;
+padding: 25px;
+}
+
+h1 {
+font-size: 42px;
+margin: 0;
+letter-spacing: 2px;
+}
+
+/* INPUT */
+input, button {
+padding: 10px;
+margin: 8px;
+border-radius: 8px;
+border: none;
+}
+
+button {
+background: #2d6cdf;
+color: white;
+cursor: pointer;
+}
+
+/* MAP */
+#map {
+height: 450px;
+width: 95%;
+margin: auto;
+border-radius: 12px;
+}
+
+/* ERROR */
+#msg {
+color: red;
+font-weight: bold;
+margin-top: 10px;
+}
+
+/* CARD DESIGN */
+.card-container {
+display: flex;
+justify-content: center;
+flex-wrap: wrap;
+margin-top: 15px;
+}
+
+.card {
+background: white;
+width: 90%;
+max-width: 600px;
+margin: 15px;
+padding: 20px;
+border-radius: 15px;
+box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+text-align: left;
+}
+
+.card h2 {
+margin-top: 0;
+color: #2d6cdf;
+}
+
+.section-title {
+font-weight: bold;
+margin-top: 10px;
+color: #333;
 }
 </style>
 </head>
@@ -34,10 +91,175 @@ text-align:left;
 <body>
 
 <header>
-<h2>Climaplan Albania 🇦🇱</h2>
+<h1>Visitor Albania 🇦🇱</h1>
 </header>
 
 <br>
 
 <input id="cityInput" placeholder="Enter Albanian county">
-<button onclick="searchCity()">Search</button>…
+<button onclick="searchCity()">Search</button>
+
+<p id="msg"></p>
+
+<div id="map"></div>
+
+<!-- MODERN CARD -->
+<div class="card-container">
+<div class="card" id="infoCard" style="display:none;">
+<h2 id="cityTitle"></h2>
+<p id="cityDesc"></p>
+<p class="section-title">🍲 Food</p>
+<p id="cityFood"></p>
+<p class="section-title">🎯 Fun Fact</p>
+<p id="cityFact"></p>
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+
+/* 🗺️ MAP */
+let map = L.map('map').setView([41.3275,19.8189],8);
+
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
+attribution:'OpenStreetMap'
+}).addTo(map);
+
+let marker;
+
+/* 🟢 COUNTIES */
+const counties = {
+"tirana":[41.3275,19.8189],
+"durres":[41.3246,19.4569],
+"diber":[41.5889,20.2356],
+"shkoder":[42.0685,19.5188],
+"elbasan":[41.1102,20.0823],
+"fier":[40.7239,19.5561],
+"korce":[40.6167,20.7833],
+"gjirokaster":[40.0758,20.1389],
+"kukes":[42.0769,20.4219],
+"lezhe":[41.7861,19.6547],
+"berat":[40.7058,19.9522],
+"vlore":[40.4661,19.4914]
+};
+
+/* 📖 CITY DATA */
+const cityInfo = {
+tirana: {
+desc: "Tirana County is the most dynamic and modern part of Albania. The capital city is full of life, with colorful buildings, busy cafés, universities, museums, and a growing nightlife scene. You’ll also find cultural landmarks like Skanderbeg Square, the National History Museum, and the Pyramid of Tirana.",
+food: "Tavë Kosi, fërgesë, byrek, qofte, grilled meats. Best areas: Blloku & city center.",
+fact: "Tirana became Albania’s capital in 1920 after the Congress of Lushnjë."
+},
+
+durres: {
+desc: "Durrës County is one of the oldest coastal regions in Albania with over 2,500 years of history and beautiful Adriatic beaches.",
+food: "Fresh seafood, grilled fish, calamari, octopus.",
+fact: "Durrës Amphitheatre is one of the largest Roman amphitheaters in the Balkans."
+},
+
+diber: {
+desc: "Dibër County is a mountainous region known for untouched nature and traditional village life.",
+food: "Jufka Dibre, mountain cheese, honey, lamb.",
+fact: "Home to Mount Korab, the highest peak in Albania."
+},
+
+shkoder: {
+desc: "Shkodër County is a cultural and historical region near Lake Shkodër with strong artistic traditions.",
+food: "Krap në tavë, northern pies, meat dishes.",
+fact: "Rozafa Castle is linked to a famous Albanian legend."
+},
+
+elbasan: {
+desc: "Elbasan County is a central historic region with an Ottoman fortress still used today.",
+food: "Ballokume (traditional sweet cookie).",
+fact: "Originally known as the Roman city Scampis."
+},
+
+fier: {
+desc: "Fier County is an agricultural region and home to the ancient city of Apollonia.",
+food: "Byrek, lamb dishes, dairy products.",
+fact: "Apollonia was a major ancient Greek colony."
+},
+
+korce: {
+desc: "Korçë County is known for culture, music, education, and cold winters.",
+food: "Lakror pie, roasted lamb, raki.",
+fact: "First Albanian-language school opened in 1887."
+},
+
+gjirokaster: {
+desc: "Gjirokastër is a UNESCO stone city with Ottoman architecture.",
+food: "Qifqi, oshaf, lamb dishes.",
+fact: "It is a UNESCO World Heritage Site."
+},
+
+kukes: {
+desc: "Kukës County is a peaceful mountainous region with lakes and nature.",
+food: "Flija, corn bread, dairy, roasted meat.",
+fact: "Hosted refugees during the Kosovo War."
+},
+
+lezhe: {
+desc: "Lezhë County is a calm coastal and historical region.",
+food: "Tavë Lezhe, seafood, fish.",
+fact: "Skanderbeg’s memorial is located here."
+},
+
+berat: {
+desc: "Berat is the City of a Thousand Windows and a UNESCO site.",
+food: "Pula me përshesh, olive oil dishes, wine.",
+fact: "Has been inhabited for over 2,400 years."
+},
+
+vlore: {
+desc: "Vlorë is where Albania declared independence in 1912.",
+food: "Seafood, octopus, grilled fish.",
+fact: "Adriatic and Ionian seas meet here."
+}
+};
+
+/* 🔎 SEARCH */
+function searchCity(){
+
+let input = document.getElementById("cityInput").value.toLowerCase().trim();
+
+let found = Object.keys(counties).find(c => input.includes(c));
+
+if(!found){
+document.getElementById("msg").innerText =
+"This place is not an Albania’s county 🇦🇱";
+document.getElementById("infoCard").style.display = "none";
+return;
+}
+
+let coords = counties[found];
+
+/* MAP */
+if(marker) map.removeLayer(marker);
+
+marker = L.marker(coords).addTo(map)
+.bindPopup(found.toUpperCase())
+.openPopup();
+
+map.setView(coords,10);
+
+/* INFO CARD */
+let info = cityInfo[found];
+
+document.getElementById("infoCard").style.display = "block";
+
+document.getElementById("cityTitle").innerText = found.toUpperCase();
+document.getElementById("cityDesc").innerText = info.desc;
+document.getElementById("cityFood").innerText = info.food;
+document.getElementById("cityFact").innerText = info.fact;
+
+/* CLEAR ERROR */
+document.getElementById("msg").innerText = "";
+
+}
+
+</script>
+
+</body>
+</html>
