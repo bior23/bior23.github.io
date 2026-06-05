@@ -68,6 +68,46 @@ const counties = {
 // 🔎 SEARCH FUNCTION (case-insensitive + flexible)
 function searchCity(){
 
+  function loadWeather(city){
+
+fetch(https://api.openweathermap.org/data/2.5/weather?q=${city},AL&units=metric&appid=${API_KEY})
+.then(response => response.json())
+.then(data => {
+
+if(!data.main){
+return;
+}
+
+let temp = data.main.temp;
+let wind = data.wind.speed;
+let weather = data.weather[0].description;
+
+let advice = "";
+
+if(temp >= 30){
+advice = "🔥 Very hot day — drink water and stay cool.";
+}
+else if(temp >= 22){
+advice = "🌤️ Nice weather for a walk.";
+}
+else if(temp >= 15){
+advice = "🌥️ Mild weather — take a light jacket.";
+}
+else{
+advice = "🧥 Cold weather — dress warmly.";
+}
+
+document.getElementById("weatherBox").style.display = "block";
+document.getElementById("weatherCity").innerText = city.toUpperCase();
+document.getElementById("temp").innerText = "🌡️ Temperature: " + temp + "°C";
+document.getElementById("wind").innerText = "🌬️ Wind: " + wind + " m/s";
+document.getElementById("weather").innerText = "🌤️ Weather: " + weather;
+document.getElementById("advice").innerText = advice;
+
+})
+.catch(error => console.log(error));
+
+}
 let input = document.getElementById("cityInput").value
 .toLowerCase()
 .trim();
@@ -80,6 +120,7 @@ input.includes(c)
 if(!found){
 document.getElementById("msg").innerText =
 "This place is not in Albania 🇦🇱";
+  loadWeather(found);
 return;
 }
 
