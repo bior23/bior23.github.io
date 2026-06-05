@@ -66,7 +66,7 @@ attribution:'OpenStreetMap'
 
 let marker;
 
-// 🇦🇱 ONLY ALBANIA COUNTIES
+// 🟢 ALBANIA COUNTIES (ONLY THESE ARE ALLOWED)
 const counties = {
 "tirana":[41.3275,19.8189],
 "durres":[41.3246,19.4569],
@@ -82,31 +82,41 @@ const counties = {
 "vlore":[40.4661,19.4914]
 };
 
-// 🌤️ OPENWEATHER API KEY
-const API_KEY = "9de43a81fe7ad37cf116c9b9defe5826";
+// 🔎 SEARCH FUNCTION (case-insensitive + flexible)
+function searchCity(){
 
-// 💡 SUGGESTIONS
-function getAdvice(temp, wind){
+let input = document.getElementById("cityInput").value
+.toLowerCase()
+.trim();
 
-if(temp >= 30){
-return "🔥 Very hot day — drink water or coffee & stay in shade!";
-}
-else if(temp >= 22){
-return "🌤️ Nice weather — perfect for walking outside!";
-}
-else if(temp >= 15){
-return "🌥️ Mild weather — light jacket recommended.";
-}
-else{
-return "🧥 Cold weather — wear warm clothes!";
-}
+// allow partial match + flexible input
+let found = Object.keys(counties).find(c =>
+input.includes(c)
+);
 
-if(wind >= 8){
-return "🌬️ Very windy — be careful outside!";
+if(!found){
+document.getElementById("msg").innerText =
+"This place is not in Albania 🇦🇱";
+return;
 }
 
-return "🙂 Normal weather today.";
+let coords = counties[found];
+
+// 🧹 remove old marker
+if(marker) map.removeLayer(marker);
+
+// 📍 add marker
+marker = L.marker(coords).addTo(map)
+.bindPopup(found.toUpperCase())
+.openPopup();
+
+// 🎯 move map
+map.setView(coords, 10);
+
+document.getElementById("msg").innerText = "";
+
 }
+
 
 // 🌤️ WEATHER FUNCTION
 function loadWeather(city){
