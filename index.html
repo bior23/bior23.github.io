@@ -28,6 +28,13 @@ input, button { padding:10px; margin:5px; }
 <p id="msg"></p>
 
 <div id="map"></div>
+  <div id="weatherBox" style="display:none; background:white; padding:15px; margin:15px auto; width:300px; border-radius:10px;">
+  <h3 id="weatherCity"></h3>
+  <p id="temp"></p>
+  <p id="wind"></p>
+  <p id="weather"></p>
+  <p id="advice"></p>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
 
@@ -80,6 +87,7 @@ let coords = counties[found];
 
 // 🧹 remove old marker
 if(marker) map.removeLayer(marker);
+  const API_KEY = "9de43a81fe7ad37cf116c9b9defe5826";
 
 // 📍 add marker
 marker = L.marker(coords).addTo(map)
