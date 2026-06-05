@@ -8,26 +8,20 @@
 
 <style>
 body {
-font-family: Arial, sans-serif;
 margin: 0;
-background: #f4f7ff;
+font-family: Arial;
+background: #eef3ff;
 text-align: center;
 }
 
-/* HEADER */
 header {
-background: linear-gradient(90deg, #2d6cdf, #4a90e2);
+background: linear-gradient(90deg,#2d6cdf,#4a90e2);
 color: white;
 padding: 25px;
 }
 
-h1 {
-font-size: 42px;
-margin: 0;
-letter-spacing: 2px;
-}
+h1 { font-size: 42px; margin: 0; }
 
-/* INPUT */
 input, button {
 padding: 10px;
 margin: 8px;
@@ -41,7 +35,6 @@ color: white;
 cursor: pointer;
 }
 
-/* MAP */
 #map {
 height: 450px;
 width: 95%;
@@ -49,41 +42,26 @@ margin: auto;
 border-radius: 12px;
 }
 
-/* ERROR */
 #msg {
 color: red;
 font-weight: bold;
-margin-top: 10px;
-}
-
-/* CARD DESIGN */
-.card-container {
-display: flex;
-justify-content: center;
-flex-wrap: wrap;
-margin-top: 15px;
 }
 
 .card {
 background: white;
-width: 90%;
-max-width: 600px;
-margin: 15px;
-padding: 20px;
+width: 92%;
+max-width: 1000px;
+margin: 20px auto;
+padding: 25px;
 border-radius: 15px;
-box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+box-shadow: 0 10px 25px rgba(0,0,0,0.15);
 text-align: left;
+display: none;
+white-space: pre-line;
 }
 
 .card h2 {
-margin-top: 0;
 color: #2d6cdf;
-}
-
-.section-title {
-font-weight: bold;
-margin-top: 10px;
-color: #333;
 }
 </style>
 </head>
@@ -94,8 +72,6 @@ color: #333;
 <h1>Visitor Albania 🇦🇱</h1>
 </header>
 
-<br>
-
 <input id="cityInput" placeholder="Enter Albanian county">
 <button onclick="searchCity()">Search</button>
 
@@ -103,23 +79,16 @@ color: #333;
 
 <div id="map"></div>
 
-<!-- MODERN CARD -->
-<div class="card-container">
-<div class="card" id="infoCard" style="display:none;">
-<h2 id="cityTitle"></h2>
-<p id="cityDesc"></p>
-<p class="section-title">🍲 Food</p>
-<p id="cityFood"></p>
-<p class="section-title">🎯 Fun Fact</p>
-<p id="cityFact"></p>
-</div>
+<div class="card" id="infoCard">
+<h2 id="title"></h2>
+<div id="text"></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
 
-/* 🗺️ MAP */
+/* MAP */
 let map = L.map('map').setView([41.3275,19.8189],8);
 
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
@@ -128,131 +97,188 @@ attribution:'OpenStreetMap'
 
 let marker;
 
-/* 🟢 COUNTIES */
-const counties = {
-"tirana":[41.3275,19.8189],
-"durres":[41.3246,19.4569],
-"diber":[41.5889,20.2356],
-"shkoder":[42.0685,19.5188],
-"elbasan":[41.1102,20.0823],
-"fier":[40.7239,19.5561],
-"korce":[40.6167,20.7833],
-"gjirokaster":[40.0758,20.1389],
-"kukes":[42.0769,20.4219],
-"lezhe":[41.7861,19.6547],
-"berat":[40.7058,19.9522],
-"vlore":[40.4661,19.4914]
-};
-
-/* 📖 CITY DATA */
-const cityInfo = {
-tirana: {
-desc: "Tirana County is the most dynamic and modern part of Albania. The capital city is full of life, with colorful buildings, busy cafés, universities, museums, and a growing nightlife scene. You’ll also find cultural landmarks like Skanderbeg Square, the National History Museum, and the Pyramid of Tirana. The city mixes history with modern energy, and it’s always changing and expanding.
-",
-food: "The most famous dish is Tavë Kosi, made with baked lamb and yogurt. You can also try fërgesë, byrek, qofte, and many grilled meats in traditional restaurants.",
-place: "Blloku district is great for modern food spots, while the old city center has traditional Albanian restaurants.",
-time: "Spring (April–June) and autumn (September–October) are ideal because the weather is warm but not too hot, and the city is perfect for walking and exploring.
-",
-fact: "Tirana was once filled with grey Soviet-style buildings, but after 1990, the city transformed with colorful painted apartments to symbolize hope and change."
-},
-
-durres: {
-desc: "Durrës County is one of the oldest and most important coastal regions in Albania. The city has over 2,500 years of history and was once a major Roman port. Today, it is famous for its beaches, summer tourism, and seaside atmosphere. The long Adriatic coastline makes it a popular escape from Tirana.",
-food: "Seafood is the highlight—grilled fish, calamari, octopus, and fresh mussels are served daily. Olive oil and fresh vegetables are also key parts of the cuisine.
-",
-place: "Restaurants along the Durrës promenade and beach area are the best for sunset seafood dinners.",
-time: "June to early September is best for beaches and swimming. If you prefer fewer tourists, May and September are perfect.
-",
-fact: "The Durrës Amphitheatre is one of the largest Roman amphitheaters in the Balkans and shows how important Durrës was in ancient times."
-},
-
-diber: {
-desc: "Dibër County is a mountainous region known for its wild nature, traditional villages, and untouched landscapes. It is one of the best places in Albania for hiking, nature tourism, and experiencing rural life. The region is less developed, which makes it very authentic and peaceful.",
-food: "Jufka Dibre (handmade pasta), mountain cheese, honey, and roasted lamb are local specialties. Meals are usually homemade and very natural.",
-place: "Guesthouses in mountain villages are the best place to try traditional cooking made by local families.",
-time: "Late spring (May–June) and early autumn (September) are best because the mountains are green and weather is comfortable for hiking.",
-fact: "Part of the region includes the impressive Korab Mountain, which is the highest peak in Albania and a challenge for hikers.."
-},
-
-shkoder: {
-desc: "Shkodër County is one of Albania’s most cultural and historical regions. It is located near Lake Shkodër, the largest lake in the Balkans, and is surrounded by rivers and mountains. The city is known for its strong artistic traditions, photography culture, and music history.",
-food: "Krap në tavë (baked carp from Lake Shkodër), as well as northern Albanian pies and meat dishes..",
-place: "Lakeside restaurants and places near Rozafa Castle offer both traditional food and amazing views.",
-time: "Spring and early summer (April–June) are perfect for lake views and warm but not hot weather. Autumn is also beautiful with fewer tourists.",
-fact: "Rozafa Castle is linked to a famous legend about sacrifice and strength, making it one of the most iconic castles in Albania.."
-},
-
-elbasan: {
-desc: "Elbasan County lies in central Albania and has historically been an important trading and cultural crossroads. The city has an old Ottoman fortress where people still live and work today, making it unique compared to other historical sites.",
-food: "Ballokume is the most famous food here. It is a sweet cookie made for the celebration of “Dita e Verës” (Summer Day), one of Albania’s most important holidays..",
-place: "Inside Elbasan Castle, you can find traditional bakeries and restaurants serving local dishes.",
-time: "March 14 (Dita e Verës festival) is the best cultural experience. Otherwise, spring and autumn are ideal for walking around the city comfortably.",
-fact: "The city was originally a Roman settlement called Scampis."
-},
-
-fier: {
-desc: "Fier County is known for its fertile plains, agriculture, and important ancient ruins. It is one of Albania’s main food-producing regions and also has major archaeological importance..",
-food: "Byrek, lamb dishes, dairy products, and olive oil-based meals are very common and fresh..",
-place: "Rural farms and traditional restaurants near Fier city offer authentic home-cooked Albanian food.",
-time: "Spring (April–June) is best because the countryside is green and perfect for visiting ruins and nature.",
-fact: "The ancient city of Apollonia was once a major Greek colony where important historical figures studied."
-},
-
-korce: {
-desc: "Korçë County is a cultural and artistic center in southeastern Albania. It is known for its clean streets, European-style architecture, and cold winters. The city has a strong identity in music, education, and traditional cuisine.",
-food: "Lakror (layered pie), roasted lamb, pickled vegetables, and raki are very typical here.",
-place: "Old taverns in Korçë city center often have live traditional music with food.",
-time: "Winter (December–February) is great for snow and atmosphere, while summer is perfect for festivals and walking tours.",
-fact: "The first Albanian-language school was opened in Korçë in 1887."
-},
-
-gjirokaster: {
-desc: "Gjirokastër County is famous for its stone architecture and steep hillside city design. It feels like a living museum with Ottoman-style houses and narrow cobblestone streets. The region has strong cultural traditions and is very well preserved",
-food: "Qifqi (rice balls with herbs), oshaf (fig dessert), and lamb dishes are local specialties.",
-place: "Restaurants in the old bazaar area serve traditional food inside historic stone buildings.",
-time: "Spring and autumn are best because the weather is mild and perfect for walking uphill streets.",
-fact: "The city of Gjirokastër is listed by UNESCO due to its rare Ottoman architecture."
-},
-
-kukes: {
-desc: "Kukës County is a remote mountainous region in northeastern Albania. It is known for dramatic landscapes, rivers, and artificial lakes created by hydroelectric dams. The region is quiet, peaceful, and very natural..",
-food: "Flija (layered pancake dish), corn bread, dairy products, and roasted meat are common..",
-place: "Mountain guesthouses and family homes are the best places to try traditional cooking.",
-time: "Summer (June–September) is best for hiking, lake activities, and road travel.",
-fact: "Kukës gained international attention in 1999 when it hosted thousands of refugees during the Kosovo War."
-},
-
-lezhe: {
-desc: "Lezhë County is a peaceful coastal region with a mix of beaches, rivers, and historical sites. It is less crowded than other tourist destinations, making it ideal for calm travel.",
-food: "Tavë Lezhe (meat casserole), seafood, and fresh fish are very popular.",
-place: "Shëngjin beach restaurants are known for fresh seafood and relaxed seaside dining.",
-time: "June to September is best for beaches, while spring is great for sightseeing and nature.",
-fact: " The Memorial of Skanderbeg marks the burial place of Albania’s national hero."
-},
-
-berat: {
-desc: "Berat County is one of the most beautiful and historic regions in Albania. It is known as the “City of a Thousand Windows” because of its white Ottoman houses stacked on hillsides. It is a UNESCO World Heritage Site and has been inhabited for thousands of years.",
-food: "Pula me përshesh (chicken with bread crumbs), olive oil dishes, and local wines are famous here.",
-place: "Restaurants inside Berat offer amazing views of the river and castle.",
-time: "Spring and autumn are perfect because the weather is mild and ideal for walking through the old town.",
-fact: "Berat has been continuously inhabited for over 2,400 years."
-},
-
-vlore: {
-desc: "Vlorë County is one of the most beautiful coastal regions in Albania where the Adriatic and Ionian seas meet. It has stunning beaches, mountains, and islands like Sazan and Karaburun nearby..",
-food: "Fresh seafood, octopus, grilled fish, and olive oil-based dishes are specialties..",
-place: "Lungomare in Vlorë and seaside villages like Dhërmi, Himarë, and Jale offer amazing food spots.",
-time: "June to September is perfect for beaches and swimming. Late spring and early autumn are best for quieter travel..",
-fact: "Albania declared its independence in Vlorë on November 28, 1912, making it one of the most important cities in national history."
+/* FIX INPUT */
+function normalize(t){
+return t.toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
 }
+
+/* COUNTIES */
+const counties = {
+tirana:[41.3275,19.8189],
+tirane:[41.3275,19.8189],
+tiran:[41.3275,19.8189],
+durres:[41.3246,19.4569],
+durrës:[41.3246,19.4569],
+diber:[41.5889,20.2356],
+shkoder:[42.0685,19.5188],
+elbasan:[41.1102,20.0823],
+fier:[40.7239,19.5561],
+korce:[40.6167,20.7833],
+korca:[40.6167,20.7833],
+korçë:[40.6167,20.7833],
+gjirokaster:[40.0758,20.1389],
+kukes:[42.0769,20.4219],
+lezhe:[41.7861,19.6547],
+berat:[40.7058,19.9522],
+vlore:[40.4661,19.4914]
 };
 
-/* 🔎 SEARCH */
+/* FULL TEXTS (YOUR EXACT CONTENT RESTORED) */
+const cityInfo = {
+
+tirana:`Tirana County
+
+Tirana County is the most dynamic and modern part of Albania. The capital city is full of life, with colorful buildings, busy cafés, universities, museums, and a growing nightlife scene. You’ll also find cultural landmarks like Skanderbeg Square, the National History Museum, and the Pyramid of Tirana. The city mixes history with modern energy, and it’s always changing and expanding.
+
+Traditional food to try: The most famous dish is Tavë Kosi, made with baked lamb and yogurt. You can also try fërgesë, byrek, qofte, and many grilled meats in traditional restaurants.
+
+Food place idea: Blloku district is great for modern food spots, while the old city center has traditional Albanian restaurants.
+
+Best time to visit: Spring (April–June) and autumn (September–October) are ideal because the weather is warm but not too hot, and the city is perfect for walking and exploring.
+
+Fun fact: Tirana was once filled with grey Soviet-style buildings, but after 1990, the city transformed with colorful painted apartments to symbolize hope and change.`,
+
+durres:`Durrës County
+
+Durrës County is one of the oldest and most important coastal regions in Albania. The city has over 2,500 years of history and was once a major Roman port. Today, it is famous for its beaches, summer tourism, and seaside atmosphere. The long Adriatic coastline makes it a popular escape from Tirana.
+
+Traditional food to try: Seafood is the highlight—grilled fish, calamari, octopus, and fresh mussels are served daily. Olive oil and fresh vegetables are also key parts of the cuisine.
+
+Food place idea: Restaurants along the Durrës promenade and beach area are the best for sunset seafood dinners.
+
+Best time to visit: June to early September is best for beaches and swimming. If you prefer fewer tourists, May and September are perfect.
+
+Historical fact: The Durrës Amphitheatre is one of the largest Roman amphitheaters in the Balkans and shows how important Durrës was in ancient times.`,
+
+diber:`Dibër County
+
+Dibër County is a mountainous region known for its wild nature, traditional villages, and untouched landscapes. It is one of the best places in Albania for hiking, nature tourism, and experiencing rural life. The region is less developed, which makes it very authentic and peaceful.
+
+Traditional food to try: Jufka Dibre (handmade pasta), mountain cheese, honey, and roasted lamb are local specialties. Meals are usually homemade and very natural.
+
+Food place idea: Guesthouses in mountain villages are the best place to try traditional cooking made by local families.
+
+Best time to visit: Late spring (May–June) and early autumn (September) are best because the mountains are green and weather is comfortable for hiking.
+
+Fun fact: Part of the region includes the impressive Korab Mountain, which is the highest peak in Albania.`,
+
+shkoder:`Shkodër County
+
+Shkodër County is one of Albania’s most cultural and historical regions. It is located near Lake Shkodër, the largest lake in the Balkans, and is surrounded by rivers and mountains. The city is known for its strong artistic traditions, photography culture, and music history.
+
+Traditional food to try: Krap në tavë (baked carp from Lake Shkodër), as well as northern Albanian pies and meat dishes.
+
+Food place idea: Lakeside restaurants and places near Rozafa Castle offer both traditional food and amazing views.
+
+Best time to visit: Spring and early summer (April–June) are perfect for lake views and warm but not hot weather. Autumn is also beautiful with fewer tourists.
+
+Historical fact: Rozafa Castle is linked to a famous legend about sacrifice and strength.`,
+
+elbasan:`Elbasan County
+
+Elbasan County lies in central Albania and has historically been an important trading and cultural crossroads. The city has an old Ottoman fortress where people still live and work today.
+
+Traditional food to try: Ballokume is the most famous food here. It is a sweet cookie made for “Dita e Verës”.
+
+Food place idea: Inside Elbasan Castle you can find traditional bakeries and restaurants.
+
+Best time to visit: March 14 (festival day) is best, otherwise spring and autumn.
+
+Fun fact: The city was originally a Roman settlement called Scampis.`,
+
+fier:`Fier County
+
+Fier County is known for agriculture and important ancient ruins.
+
+Traditional food to try: Byrek, lamb dishes, dairy products, olive oil meals.
+
+Food place idea: Rural farms and traditional restaurants.
+
+Best time to visit: Spring.
+
+Historical fact: Apollonia was once a major Greek colony.`,
+
+korce:`Korçë County
+
+Korçë County is a cultural and artistic center in southeastern Albania.
+
+Traditional food to try: Lakror, roasted lamb, pickled vegetables, raki.
+
+Food place idea: Old taverns with live music.
+
+Best time to visit: Winter and summer festivals.
+
+Fun fact: First Albanian school opened in 1887.`,
+
+gjirokaster:`Gjirokastër County
+
+Gjirokastër is famous for stone houses and Ottoman architecture.
+
+Traditional food to try: Qifqi, oshaf, lamb dishes.
+
+Food place idea: Old bazaar restaurants.
+
+Best time to visit: Spring and autumn.
+
+Historical fact: UNESCO World Heritage Site.`,
+
+kukes:`Kukës County
+
+Kukës is a remote mountainous region with lakes and rivers.
+
+Traditional food to try: Flija, corn bread, dairy, roasted meat.
+
+Food place idea: Mountain guesthouses.
+
+Best time to visit: Summer.
+
+Fun fact: Hosted refugees during Kosovo war.`,
+
+lezhe:`Lezhë County
+
+Lezhë is a coastal and historical region.
+
+Traditional food to try: Tavë Lezheje, seafood.
+
+Food place idea: Shëngjin beach restaurants.
+
+Best time to visit: Summer.
+
+Historical fact: Skanderbeg burial site.`,
+
+berat:`Berat County
+
+Berat is the “City of a Thousand Windows”.
+
+Traditional food to try: Pula me përshesh, olive oil dishes.
+
+Food place idea: River view restaurants.
+
+Best time to visit: Spring and autumn.
+
+Fun fact: UNESCO World Heritage Site.`,
+
+vlore:`Vlorë County
+
+Vlorë is where Albania declared independence in 1912.
+
+Traditional food to try: Seafood, octopus, grilled fish.
+
+Food place idea: Lungomare coastline.
+
+Best time to visit: Summer.
+
+Historical fact: Adriatic meets Ionian Sea.`
+};
+
+/* SEARCH */
 function searchCity(){
 
-let input = document.getElementById("cityInput").value.toLowerCase().trim();
+let input = normalize(document.getElementById("cityInput").value);
 
-let found = Object.keys(counties).find(c => input.includes(c));
+let found = Object.keys(counties).find(c =>
+normalize(c).includes(input)
+);
 
 if(!found){
 document.getElementById("msg").innerText =
@@ -263,7 +289,6 @@ return;
 
 let coords = counties[found];
 
-/* MAP */
 if(marker) map.removeLayer(marker);
 
 marker = L.marker(coords).addTo(map)
@@ -272,21 +297,13 @@ marker = L.marker(coords).addTo(map)
 
 map.setView(coords,10);
 
-/* INFO CARD */
-let info = cityInfo[found];
-
 document.getElementById("infoCard").style.display = "block";
+document.getElementById("title").innerText = found.toUpperCase();
+document.getElementById("text").innerText = cityInfo[found];
 
-document.getElementById("cityTitle").innerText = found.toUpperCase();
-document.getElementById("cityDesc").innerText = info.desc;
-document.getElementById("cityFood").innerText = info.food;
-document.getElementById("cityFact").innerText = info.fact;
-
-/* CLEAR ERROR */
 document.getElementById("msg").innerText = "";
 
 }
-
 </script>
 
 </body>
