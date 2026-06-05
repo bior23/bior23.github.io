@@ -1,49 +1,186 @@
-// 🌍 OpenWeather API KEY
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Climaplan Albania</title>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css"/>
+
+<style>
+body { font-family: Arial; text-align:center; margin:0; background:#eef6ff; }
+header { background:#2d6cdf; color:white; padding:15px; }
+input, button { padding:10px; margin:5px; }
+
+#map {
+height:450px;
+width:95%;
+margin:auto;
+border-radius:10px;
+}
+
+.card {
+background:white;
+padding:10px;
+margin-top:10px;
+display:inline-block;
+border-radius:10px;
+min-width:250px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h2>Climaplan Albania 🇦🇱</h2>
+</header>
+
+<br>
+
+<input id="cityInput" placeholder="Enter Albanian county">
+<button onclick="searchCity()">Search</button>
+
+<p id="msg"></p>
+
+<div id="map"></div>
+
+<!-- WEATHER BOX -->
+<div class="card" id="weatherCard" style="display:none;">
+<h3 id="cityName"></h3>
+<p id="temp"></p>
+<p id="wind"></p>
+<p id="weather"></p>
+<p id="advice"></p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+
+// 🗺️ MAP
+let map = L.map('map').setView([41.3275,19.8189],8);
+
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
+attribution:'OpenStreetMap'
+}).addTo(map);
+
+let marker;
+
+// 🇦🇱 ONLY ALBANIA COUNTIES
+const counties = {
+"tirana":[41.3275,19.8189],
+"durres":[41.3246,19.4569],
+"diber":[41.5889,20.2356],
+"shkoder":[42.0685,19.5188],
+"elbasan":[41.1102,20.0823],
+"fier":[40.7239,19.5561],
+"korce":[40.6167,20.7833],
+"gjirokaster":[40.0758,20.1389],
+"kukes":[42.0769,20.4219],
+"lezhe":[41.7861,19.6547],
+"berat":[40.7058,19.9522],
+"vlore":[40.4661,19.4914]
+};
+
+// 🌤️ OPENWEATHER API KEY
 const API_KEY = "9de43a81fe7ad37cf116c9b9defe5826";
 
-// 🌤️ MAIN WEATHER FUNCTION
-function showSimpleWeather(city) {
+// 💡 SUGGESTIONS
+function getAdvice(temp, wind){
+
+if(temp >= 30){
+return "🔥 Very hot day — drink water or coffee & stay in shade!";
+}
+else if(temp >= 22){
+return "🌤️ Nice weather — perfect for walking outside!";
+}
+else if(temp >= 15){
+return "🌥️ Mild weather — light jacket recommended.";
+}
+else{
+return "🧥 Cold weather — wear warm clothes!";
+}
+
+if(wind >= 8){
+return "🌬️ Very windy — be careful outside!";
+}
+
+return "🙂 Normal weather today.";
+}
+
+// 🌤️ WEATHER FUNCTION
+function loadWeather(city){
 
 fetch(https://api.openweathermap.org/data/2.5/weather?q=${city},AL&units=metric&appid=${API_KEY})
 .then(res => res.json())
 .then(data => {
 
-if (!data || !data.main) return;
+if(!data || !data.main){
+document.getElementById("msg").innerText =
+"Weather not available";
+return;
+}
 
-// 🌡️ DATA
 let temp = data.main.temp;
 let wind = data.wind.speed;
 let weather = data.weather[0].description;
 
-// 💡 SUGGESTION SYSTEM
-let suggestion = "";
+// show box
+document.getElementById("weatherCard").style.display = "block";
 
-if (temp >= 30) {
-suggestion = "🔥 Very hot day — drink water or stay in shade!";
-}
-else if (temp >= 22) {
-suggestion = "🌤️ Nice weather — perfect for walking!";
-}
-else if (temp >= 15) {
-suggestion = "🌥️ Mild weather — light jacket recommended.";
-}
-else {
-suggestion = "🧥 Cold weather — wear warm clothes!";
-}
-
-if (wind >= 8) {
-suggestion += " 🌬️ Windy — be careful outside!";
-}
-
-// 📦 DISPLAY (you must have these elements in HTML)
+document.getElementById("cityName").innerText = city.toUpperCase();
 document.getElementById("temp").innerText = "🌡️ Temp: " + temp + "°C";
 document.getElementById("wind").innerText = "🌬️ Wind: " + wind + " m/s";
 document.getElementById("weather").innerText = "🌤️ " + weather;
-document.getElementById("advice").innerText = suggestion;
+document.getElementById("advice").innerText = getAdvice(temp, wind);
 
 })
-.catch(err => {
-console.log("Weather error");
+.catch(err=>{
+document.getElementById("msg").innerText =
+"Weather error — map still works ✔️";
 });
 
 }
+
+// 🔎 SEARCH FUNCTION
+function searchCity(){
+
+let input = document.getElementById("cityInput").value
+.toLowerCase()
+.trim();
+
+// match county
+let found = Object.keys(counties).find(c =>
+input.includes(c)
+);
+
+// ❌ NOT ALBANIA
+if(!found){
+document.getElementById("msg").innerText =
+"This place is not an Albania county 🇦🇱";
+return;
+}
+
+let coords = counties[found];
+
+// 📍 MAP UPDATE
+if(marker) map.removeLayer(marker);
+
+marker = L.marker(coords).addTo(map)
+.bindPopup(found.toUpperCase())
+.openPopup();
+
+map.setView(coords,10);
+
+// clear message
+document.getElementById("msg").innerText = "";
+
+// 🌤️ LOAD WEATHER
+loadWeather(found);
+
+}
+
+</script>
+
+</body>
+</html>
