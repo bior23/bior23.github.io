@@ -43,9 +43,7 @@ input, button { padding:10px; margin:5px; }
 
 <script>
 
-const API_KEY = "9de43a81fe7ad37cf116c9b9defe5826";
-
-// 🗺️ MAP
+// 🗺️ MAP (ALWAYS SAFE)
 let map = L.map('map').setView([41.3275,19.8189],8);
 
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
@@ -70,24 +68,14 @@ const counties = {
 "vlore":[40.4661,19.4914]
 };
 
-// ☀️ WEATHER ADVICE SYSTEM
+// 💡 advice
 function getAdvice(temp, wind){
 
-if(temp > 28){
-return "🔥 Today is a HOT day — go drink coffee or stay in the shade!";
-}
-else if(temp > 20){
-return "🌤️ Nice weather — perfect for walking outside!";
-}
-else if(temp <= 20){
-return "🧥 A bit cold — take a jacket!";
-}
-
-if(wind > 8){
-return "🌬️ It’s windy — be careful outside!";
-}
-
-return "🙂 Normal weather today.";
+if(temp > 28) return "🔥 Hot day — drink coffee & stay cool!";
+if(temp > 20) return "🌤️ Nice weather — perfect for walking!";
+if(temp <= 20) return "🧥 Cold — take a jacket!";
+if(wind > 8) return "🌬️ Windy — be careful outside!";
+return "🙂 Normal weather.";
 }
 
 // 🔎 SEARCH
@@ -97,12 +85,11 @@ let input = document.getElementById("cityInput").value
 .toLowerCase()
 .trim();
 
-// match county
 let found = Object.keys(counties).find(c =>
 input.includes(c)
 );
 
-// ❌ NOT ALBANIA COUNTY
+// ❌ ERROR MESSAGE FIXED
 if(!found){
 document.getElementById("msg").innerText =
 "This place is not an Albania county 🇦🇱";
@@ -111,7 +98,7 @@ return;
 
 let coords = counties[found];
 
-// 📍 MAP UPDATE
+// 📍 MAP ALWAYS WORKS
 if(marker) map.removeLayer(marker);
 
 marker = L.marker(coords).addTo(map)
@@ -120,10 +107,21 @@ marker = L.marker(coords).addTo(map)
 
 map.setView(coords,10);
 
-// 🌤️ WEATHER API
+// 🧼 reset weather box first
+document.getElementById("weatherCard").style.display="none";
+
+// 🌤️ SAFE WEATHER (NO CRASH)
+const API_KEY = "9de43a81fe7ad37cf116c9b9defe5826";
+
 fetch(https://api.openweathermap.org/data/2.5/weather?q=${found},AL&appid=${API_KEY}&units=metric)
 .then(res => res.json())
 .then(data => {
+
+if(!data || !data.main){
+document.getElementById("msg").innerText =
+"Weather not available right now";
+return;
+}
 
 let temp = data.main.temp;
 let wind = data.wind.speed;
@@ -136,9 +134,12 @@ document.getElementById("wind").innerText = "🌬️ Wind: " + wind + " m/s";
 document.getElementById("humidity").innerText = "💧 Humidity: " + data.main.humidity + "%";
 document.getElementById("desc").innerText = "🌤️ " + data.weather[0].description;
 
-// 💡 advice
 document.getElementById("advice").innerText = getAdvice(temp, wind);
 
+})
+.catch(err=>{
+document.getElementById("msg").innerText =
+"Weather failed, but map still works ✔️";
 });
 
 }
