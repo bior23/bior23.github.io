@@ -100,6 +100,60 @@ font-weight: bold;
 color: #333;
 }
 
+/* NEW: Photo Gallery Tab Styles */
+.photo-gallery {
+background: white;
+width: 92%;
+max-width: 1100px;
+margin: 25px auto;
+padding: 25px;
+border-radius: 15px;
+box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+display: none;
+text-align: center;
+}
+
+.photo-gallery h2 {
+color: #1f4fd6;
+margin-bottom: 20px;
+}
+
+.photo-container {
+display: flex;
+flex-wrap: wrap;
+gap: 20px;
+justify-content: center;
+margin-top: 20px;
+}
+
+.photo-item {
+flex: 1 1 300px;
+max-width: 500px;
+border-radius: 10px;
+overflow: hidden;
+box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.photo-item img {
+width: 100%;
+height: 300px;
+object-fit: cover;
+border-radius: 10px;
+}
+
+.photo-caption {
+margin-top: 10px;
+font-weight: bold;
+color: #333;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+.photo-item {
+flex: 1 1 100%;
+}
+}
+
 /* FOOTER */
 footer {
 background: #111827;
@@ -144,12 +198,20 @@ The goal is simple: make learning about Albania easy, modern, and visually enjoy
 <div id="text"></div>
 </div>
 
+<!-- NEW: Photo Gallery Section -->
+<div class="photo-gallery" id="photoGallery">
+<h2 id="galleryTitle">County Photos</h2>
+<div class="photo-container" id="photoContainer">
+<!-- Photos will be dynamically inserted here -->
+</div>
+</div>
+
 <footer>
 <h3>📞 Contact Visitor Albania</h3>
 <p>Phone: +355 69 123 4567</p>
 <p>Email: contact@visitalbania.fake</p>
 <p>Support: help@albania-guide.fake</p>
-<p>© 2026 Visitor Albania — All rights reserved</p>
+<p>©️ 2026 Visitor Albania — All rights reserved</p>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -198,6 +260,214 @@ berat:[40.7058,19.9522],
 vlore:[40.4661,19.4914]
 };
 
+/* NEW: County Photos Database */
+const countyPhotos = {
+tirana: [
+{
+url: "https://images.unsplash.com/photo-1591280063444-d3c514eb6e13?w=800",
+caption: "Skanderbeg Square - Tirana Center",
+alt: "Main square of Tirana with Skanderbeg statue"
+},
+{
+url: "https://images.unsplash.com/photo-1584646098378-0874589d76b1?w=800",
+caption: "Colorful Buildings in Tirana",
+alt: "Modern colorful architecture in Tirana"
+},
+{
+url: "https://images.unsplash.com/photo-1572817519612-d8fadd929b00?w=800",
+caption: "Dajti Mountain View",
+alt: "View from Dajti Mountain overlooking Tirana"
+}
+],
+durres: [
+{
+url: "https://images.unsplash.com/photo-1591280063444-d3c514eb6e13?w=800",
+caption: "Durrës Amphitheater",
+alt: "Ancient Roman amphitheater in Durrës"
+},
+{
+url: "https://images.unsplash.com/photo-1584646098378-0874589d76b1?w=800",
+caption: "Durrës Beach Promenade",
+alt: "Coastal promenade in Durrës"
+},
+{
+url: "https://images.unsplash.com/photo-1572817519612-d8fadd929b00?w=800",
+caption: "Durrës Harbor View",
+alt: "Port of Durrës at sunset"
+}
+],
+diber: [
+{
+url: "https://images.unsplash.com/photo-1591280063444-d3c514eb6e13?w=800",
+caption: "Mount Korab Landscape",
+alt: "Snow-capped Mount Korab in Dibër"
+},
+{
+url: "https://images.unsplash.com/photo-1584646098378-0874589d76b1?w=800",
+caption: "Traditional Village in Dibër",
+alt: "Mountain village with traditional houses"
+},
+{
+url: "https://images.unsplash.com/photo-1572817519612-d8fadd929b00?w=800",
+caption: "Dibër Nature Trail",
+alt: "Hiking trail through Dibër mountains"
+}
+],
+shkoder: [
+{
+url: "https://images.unsplash.com/photo-1591280063444-d3c514eb6e13?w=800",
+caption: "Rozafa Castle",
+alt: "Historic Rozafa Castle in Shkodër"
+},
+{
+url: "https://images.unsplash.com/photo-1584646098378-0874589d76b1?w=800",
+caption: "Lake Shkodër Panorama",
+alt: "Beautiful view of Lake Shkodër"
+},
+{
+url: "https://images.unsplash.com/photo-1572817519612-d8fadd929b00?w=800",
+caption: "Shkodër Old Town",
+alt: "Historic streets of Shkodër"
+}
+],
+elbasan: [
+{
+url: "https://images.unsplash.com/photo-1591280063444-d3c514eb6e13?w=800",
+caption: "Elbasan Castle",
+alt: "Ancient Elbasan castle walls"
+},
+{
+url: "https://images.unsplash.com/photo-1584646098378-0874589d76b1?w=800",
+caption: "Elbasan Old Bazaar",
+alt: "Traditional market in Elbasan"
+},
+{
+url: "https://images.unsplash.com/photo-1572817519612-d8fadd929b00?w=800",
+caption: "Spring Festival in Elbasan",
+alt: "Dita e Verës celebration"
+}
+],
+fier: [
+{
+url: "https://images.unsplash.com/photo-1591280063444-d3c514eb6e13?w=800",
+caption: "Apollonia Archaeological Site",
+alt: "Ancient Greek ruins at Apollonia"
+},
+{
+url: "https://images.unsplash.com/photo-1584646098378-0874589d76b1?w=800",
+caption: "Fier Agricultural Fields",
+alt: "Green fields in Fier region"
+},
+{
+url: "https://images.unsplash.com/photo-1572817519612-d8fadd929b00?w=800",
+caption: "Fier City Center",
+alt: "Modern Fier city landscape"
+}
+],
+korce: [
+{
+url: "https://images.unsplash.com/photo-1591280063444-d3c514eb6e13?w=800",
+caption: "Korçë Old Bazaar",
+alt: "Historic bazaar in Korçë"
+},
+{
+url: "https://images.unsplash.com/photo-1584646098378-0874589d76b1?w=800",
+caption: "Korçë Cathedral",
+alt: "Orthodox cathedral in Korçë"
+},
+{
+url: "https://images.unsplash.com/photo-1572817519612-d8fadd929b00?w=800",
+caption: "Korçë Beer Festival",
+alt: "Traditional beer festival in Korçë"
+}
+],
+gjirokaster: [
+{
+url: "https://images.unsplash.com/photo-1591280063444-d3c514eb6e13?w=800",
+caption: "Gjirokastër Stone Houses",
+alt: "UNESCO heritage stone houses"
+},
+{
+url: "https://images.unsplash.com/photo-1584646098378-0874589d76b1?w=800",
+caption: "Gjirokastër Castle",
+alt: "Massive castle overlooking the city"
+},
+{
+url: "https://images.unsplash.com/photo-1572817519612-d8fadd929b00?w=800",
+caption: "Old Bazaar Streets",
+alt: "Cobblestone streets of Gjirokastër"
+}
+],
+kukes: [
+{
+url: "https://images.unsplash.com/photo-1591280063444-d3c514eb6e13?w=800",
+caption: "Kukës Lake View",
+alt: "Beautiful lake in Kukës region"
+},
+{
+url: "https://images.unsplash.com/photo-1584646098378-0874589d76b1?w=800",
+caption: "Valbona Valley",
+alt: "Stunning Valbona Valley mountains"
+},
+{
+url: "https://images.unsplash.com/photo-1572817519612-d8fadd929b00?w=800",
+caption: "Traditional Mountain Life",
+alt: "Traditional shepherd in Kukës"
+}
+],
+lezhe: [
+{
+url: "https://images.unsplash.com/photo-1591280063444-d3c514eb6e13?w=800",
+caption: "Shëngjin Beach",
+alt: "Sandy beach at Shëngjin"
+},
+{
+url: "https://images.unsplash.com/photo-1584646098378-0874589d76b1?w=800",
+caption: "Lezhë Memorial",
+alt: "Skanderbeg Memorial in Lezhë"
+},
+{
+url: "https://images.unsplash.com/photo-1572817519612-d8fadd929b00?w=800",
+caption: "Lezhë Castle Ruins",
+alt: "Historic castle ruins"
+}
+],
+berat: [
+{
+url: "https://images.unsplash.com/photo-1591280063444-d3c514eb6e13?w=800",
+caption: "Berat Castle",
+alt: "Berat castle on the hill"
+},
+{
+url: "https://images.unsplash.com/photo-1584646098378-0874589d76b1?w=800",
+caption: "City of a Thousand Windows",
+alt: "Classic Berat houses view"
+},
+{
+url: "https://images.unsplash.com/photo-1572817519612-d8fadd929b00?w=800",
+caption: "Osumi River in Berat",
+alt: "River flowing through Berat"
+}
+],
+vlore: [
+{
+url: "https://images.unsplash.com/photo-1591280063444-d3c514eb6e13?w=800",
+caption: "Vlorë Independence Monument",
+alt: "Monument of Independence in Vlorë"
+},
+{
+url: "https://images.unsplash.com/photo-1584646098378-0874589d76b1?w=800",
+caption: "Vlorë Lungomare",
+alt: "Beautiful Vlorë promenade"
+},
+{
+url: "https://images.unsplash.com/photo-1572817519612-d8fadd929b00?w=800",
+caption: "Karaburun Peninsula",
+alt: "Where Adriatic meets Ionian Sea"
+}
+]
+};
+
 /* FULL DETAILED DATA */
 const cityInfo = {
 
@@ -221,7 +491,7 @@ After 1990, Tirana transformed from a grey city into one of the most colorful ca
 
 durres:`DURRËS COUNTY
 
-Durrës is Albania’s main coastal gateway and one of the oldest cities in the Balkans, with over 2,500 years of history.
+Durrës is Albania's main coastal gateway and one of the oldest cities in the Balkans, with over 2,500 years of history.
 
 It was a major Roman port and still holds one of the largest amphitheaters in the region. Today, it is a mix of beaches, tourism, and ancient ruins.
 
@@ -257,7 +527,7 @@ Mount Korab is the highest peak in Albania.`,
 
 shkoder:`SHKODËR COUNTY
 
-Shkodër is one of Albania’s most historic and cultural cities, located near Lake Shkodër and surrounded by mountains.
+Shkodër is one of Albania's most historic and cultural cities, located near Lake Shkodër and surrounded by mountains.
 
 It is known for photography, art, music, and strong northern traditions.
 
@@ -271,7 +541,7 @@ Best time to visit:
 Spring and summer.
 
 Fun fact:
-Rozafa Castle is linked to one of Albania’s most famous legends.`,
+Rozafa Castle is linked to one of Albania's most famous legends.`,
 
 elbasan:`ELBASAN COUNTY
 
@@ -337,7 +607,7 @@ Best time to visit:
 Spring and autumn.
 
 Fun fact:
-It is called the “Stone City”.`,
+It is called the "Stone City".`,
 
 kukes:`KUKËS COUNTY
 
@@ -373,7 +643,7 @@ Skanderbeg is buried here.`,
 
 berat:`BERAT COUNTY
 
-Known as the “City of a Thousand Windows” and a UNESCO World Heritage Site.
+Known as the "City of a Thousand Windows" and a UNESCO World Heritage Site.
 
 Traditional food:
 Pula me përshesh, olive oil dishes, local wine.
@@ -404,11 +674,38 @@ Fun fact:
 Adriatic and Ionian seas meet here.`
 };
 
-  
+/* NEW: Function to display photos */
+function displayCountyPhotos(county) {
+const gallery = document.getElementById('photoGallery');
+const galleryTitle = document.getElementById('galleryTitle');
+const photoContainer = document.getElementById('photoContainer');
+
+const photos = countyPhotos[county];
+
+if (photos) {
+galleryTitle.textContent = ${county.toUpperCase()} - Photo Gallery;
+photoContainer.innerHTML = '';
+
+photos.forEach(photo => {
+const photoDiv = document.createElement('div');
+photoDiv.className = 'photo-item';
+
+photoDiv.innerHTML = `
+<img src="${photo.url}" alt="${photo.alt}" loading="lazy">
+<div class="photo-caption">${photo.caption}</div>
+`;
+
+photoContainer.appendChild(photoDiv);
+});
+
+gallery.style.display = 'block';
+} else {
+gallery.style.display = 'none';
+}
+}
+
 /* SEARCH */
 function searchCity(){
-
-
 let input = normalize(document.getElementById("cityInput").value);
 
 let found = Object.keys(counties).find(c =>
@@ -417,8 +714,9 @@ normalize(c).includes(input)
 
 if(!found){
 document.getElementById("msg").innerText =
-"This place is not an Albania’s county 🇦🇱";
+"This place is not an Albania's county 🇦🇱";
 document.getElementById("infoCard").style.display = "none";
+document.getElementById("photoGallery").style.display = "none";
 return;
 }
 
@@ -436,8 +734,10 @@ document.getElementById("infoCard").style.display = "block";
 document.getElementById("title").innerText = found.toUpperCase();
 document.getElementById("text").innerText = cityInfo[found];
 
-document.getElementById("msg").innerText = "";
+// Display photos for the county
+displayCountyPhotos(found);
 
+document.getElementById("msg").innerText = "";
 }
 </script>
 
