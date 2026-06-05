@@ -100,7 +100,7 @@ font-weight: bold;
 color: #333;
 }
 
-/* NEW: Photo Gallery Tab Styles */
+/* PHOTO GALLERY */
 .photo-gallery {
 background: white;
 width: 92%;
@@ -110,48 +110,43 @@ padding: 25px;
 border-radius: 15px;
 box-shadow: 0 10px 30px rgba(0,0,0,0.12);
 display: none;
-text-align: center;
 }
 
-.photo-gallery h2 {
+.photo-gallery h3 {
 color: #1f4fd6;
-margin-bottom: 20px;
+margin-bottom: 15px;
+font-size: 20px;
 }
 
-.photo-container {
-display: flex;
-flex-wrap: wrap;
-gap: 20px;
-justify-content: center;
-margin-top: 20px;
+.photo-grid {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+gap: 15px;
 }
 
 .photo-item {
-flex: 1 1 300px;
-max-width: 500px;
 border-radius: 10px;
 overflow: hidden;
-box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+transition: transform 0.3s;
+}
+
+.photo-item:hover {
+transform: scale(1.02);
 }
 
 .photo-item img {
 width: 100%;
-height: 300px;
+height: 200px;
 object-fit: cover;
-border-radius: 10px;
+display: block;
 }
 
-.photo-caption {
-margin-top: 10px;
-font-weight: bold;
+.photo-item p {
+margin: 10px;
+font-size: 14px;
 color: #333;
-}
-
-/* Responsive design */
-@media (max-width: 768px) {
-.photo-item {
-flex: 1 1 100%;
-}
+font-weight: 500;
 }
 
 /* FOOTER */
@@ -198,12 +193,10 @@ The goal is simple: make learning about Albania easy, modern, and visually enjoy
 <div id="text"></div>
 </div>
 
-<!-- NEW: Photo Gallery Section -->
+<!-- Photo Gallery - NEW ADDITION -->
 <div class="photo-gallery" id="photoGallery">
-<h2 id="galleryTitle">County Photos</h2>
-<div class="photo-container" id="photoContainer">
-<!-- Photos will be dynamically inserted here -->
-</div>
+<h3>📸 County Photo Gallery</h3>
+<div class="photo-grid" id="photoGrid"></div>
 </div>
 
 <footer>
@@ -260,211 +253,67 @@ berat:[40.7058,19.9522],
 vlore:[40.4661,19.4914]
 };
 
-/* NEW: County Photos Database */
+/* PHOTO LINKS - Using placeholder images from picsum.photos */
 const countyPhotos = {
 tirana: [
-{
-url: "https://images.unsplash.com/photo-1591280063444-d3c514eb6e13?w=800",
-caption: "Skanderbeg Square - Tirana Center",
-alt: "Main square of Tirana with Skanderbeg statue"
-},
-{
-url: "https://images.unsplash.com/photo-1584646098378-0874589d76b1?w=800",
-caption: "Colorful Buildings in Tirana",
-alt: "Modern colorful architecture in Tirana"
-},
-{
-url: "https://images.unsplash.com/photo-1572817519612-d8fadd929b00?w=800",
-caption: "Dajti Mountain View",
-alt: "View from Dajti Mountain overlooking Tirana"
-}
+{url:"https://picsum.photos/seed/tirana1/400/300", caption:"Skanderbeg Square"},
+{url:"https://picsum.photos/seed/tirana2/400/300", caption:"Blloku District"},
+{url:"https://picsum.photos/seed/tirana3/400/300", caption:"Dajti Mountain"}
 ],
 durres: [
-{
-url: "https://images.unsplash.com/photo-1591280063444-d3c514eb6e13?w=800",
-caption: "Durrës Amphitheater",
-alt: "Ancient Roman amphitheater in Durrës"
-},
-{
-url: "https://images.unsplash.com/photo-1584646098378-0874589d76b1?w=800",
-caption: "Durrës Beach Promenade",
-alt: "Coastal promenade in Durrës"
-},
-{
-url: "https://images.unsplash.com/photo-1572817519612-d8fadd929b00?w=800",
-caption: "Durrës Harbor View",
-alt: "Port of Durrës at sunset"
-}
+{url:"https://picsum.photos/seed/durres1/400/300", caption:"Roman Amphitheater"},
+{url:"https://picsum.photos/seed/durres2/400/300", caption:"Beach Promenade"},
+{url:"https://picsum.photos/seed/durres3/400/300", caption:"Durrës Port"}
 ],
 diber: [
-{
-url: "https://images.unsplash.com/photo-1591280063444-d3c514eb6e13?w=800",
-caption: "Mount Korab Landscape",
-alt: "Snow-capped Mount Korab in Dibër"
-},
-{
-url: "https://images.unsplash.com/photo-1584646098378-0874589d76b1?w=800",
-caption: "Traditional Village in Dibër",
-alt: "Mountain village with traditional houses"
-},
-{
-url: "https://images.unsplash.com/photo-1572817519612-d8fadd929b00?w=800",
-caption: "Dibër Nature Trail",
-alt: "Hiking trail through Dibër mountains"
-}
+{url:"https://picsum.photos/seed/diber1/400/300", caption:"Mount Korab"},
+{url:"https://picsum.photos/seed/diber2/400/300", caption:"Mountain Village"},
+{url:"https://picsum.photos/seed/diber3/400/300", caption:"Nature Trail"}
 ],
 shkoder: [
-{
-url: "https://images.unsplash.com/photo-1591280063444-d3c514eb6e13?w=800",
-caption: "Rozafa Castle",
-alt: "Historic Rozafa Castle in Shkodër"
-},
-{
-url: "https://images.unsplash.com/photo-1584646098378-0874589d76b1?w=800",
-caption: "Lake Shkodër Panorama",
-alt: "Beautiful view of Lake Shkodër"
-},
-{
-url: "https://images.unsplash.com/photo-1572817519612-d8fadd929b00?w=800",
-caption: "Shkodër Old Town",
-alt: "Historic streets of Shkodër"
-}
+{url:"https://picsum.photos/seed/shkoder1/400/300", caption:"Rozafa Castle"},
+{url:"https://picsum.photos/seed/shkoder2/400/300", caption:"Lake Shkodër"},
+{url:"https://picsum.photos/seed/shkoder3/400/300", caption:"Old Town"}
 ],
 elbasan: [
-{
-url: "https://images.unsplash.com/photo-1591280063444-d3c514eb6e13?w=800",
-caption: "Elbasan Castle",
-alt: "Ancient Elbasan castle walls"
-},
-{
-url: "https://images.unsplash.com/photo-1584646098378-0874589d76b1?w=800",
-caption: "Elbasan Old Bazaar",
-alt: "Traditional market in Elbasan"
-},
-{
-url: "https://images.unsplash.com/photo-1572817519612-d8fadd929b00?w=800",
-caption: "Spring Festival in Elbasan",
-alt: "Dita e Verës celebration"
-}
+{url:"https://picsum.photos/seed/elbasan1/400/300", caption:"Elbasan Castle"},
+{url:"https://picsum.photos/seed/elbasan2/400/300", caption:"Old Bazaar"},
+{url:"https://picsum.photos/seed/elbasan3/400/300", caption:"City Center"}
 ],
 fier: [
-{
-url: "https://images.unsplash.com/photo-1591280063444-d3c514eb6e13?w=800",
-caption: "Apollonia Archaeological Site",
-alt: "Ancient Greek ruins at Apollonia"
-},
-{
-url: "https://images.unsplash.com/photo-1584646098378-0874589d76b1?w=800",
-caption: "Fier Agricultural Fields",
-alt: "Green fields in Fier region"
-},
-{
-url: "https://images.unsplash.com/photo-1572817519612-d8fadd929b00?w=800",
-caption: "Fier City Center",
-alt: "Modern Fier city landscape"
-}
+{url:"https://picsum.photos/seed/fier1/400/300", caption:"Apollonia Ruins"},
+{url:"https://picsum.photos/seed/fier2/400/300", caption:"Countryside"},
+{url:"https://picsum.photos/seed/fier3/400/300", caption:"Archaeological Park"}
 ],
 korce: [
-{
-url: "https://images.unsplash.com/photo-1591280063444-d3c514eb6e13?w=800",
-caption: "Korçë Old Bazaar",
-alt: "Historic bazaar in Korçë"
-},
-{
-url: "https://images.unsplash.com/photo-1584646098378-0874589d76b1?w=800",
-caption: "Korçë Cathedral",
-alt: "Orthodox cathedral in Korçë"
-},
-{
-url: "https://images.unsplash.com/photo-1572817519612-d8fadd929b00?w=800",
-caption: "Korçë Beer Festival",
-alt: "Traditional beer festival in Korçë"
-}
+{url:"https://picsum.photos/seed/korce1/400/300", caption:"Old Bazaar"},
+{url:"https://picsum.photos/seed/korce2/400/300", caption:"Cathedral"},
+{url:"https://picsum.photos/seed/korce3/400/300", caption:"Beer Festival"}
 ],
 gjirokaster: [
-{
-url: "https://images.unsplash.com/photo-1591280063444-d3c514eb6e13?w=800",
-caption: "Gjirokastër Stone Houses",
-alt: "UNESCO heritage stone houses"
-},
-{
-url: "https://images.unsplash.com/photo-1584646098378-0874589d76b1?w=800",
-caption: "Gjirokastër Castle",
-alt: "Massive castle overlooking the city"
-},
-{
-url: "https://images.unsplash.com/photo-1572817519612-d8fadd929b00?w=800",
-caption: "Old Bazaar Streets",
-alt: "Cobblestone streets of Gjirokastër"
-}
+{url:"https://picsum.photos/seed/gjirokaster1/400/300", caption:"Stone Houses"},
+{url:"https://picsum.photos/seed/gjirokaster2/400/300", caption:"Castle View"},
+{url:"https://picsum.photos/seed/gjirokaster3/400/300", caption:"Old Streets"}
 ],
 kukes: [
-{
-url: "https://images.unsplash.com/photo-1591280063444-d3c514eb6e13?w=800",
-caption: "Kukës Lake View",
-alt: "Beautiful lake in Kukës region"
-},
-{
-url: "https://images.unsplash.com/photo-1584646098378-0874589d76b1?w=800",
-caption: "Valbona Valley",
-alt: "Stunning Valbona Valley mountains"
-},
-{
-url: "https://images.unsplash.com/photo-1572817519612-d8fadd929b00?w=800",
-caption: "Traditional Mountain Life",
-alt: "Traditional shepherd in Kukës"
-}
+{url:"https://picsum.photos/seed/kukes1/400/300", caption:"Lake View"},
+{url:"https://picsum.photos/seed/kukes2/400/300", caption:"Valbona Valley"},
+{url:"https://picsum.photos/seed/kukes3/400/300", caption:"Mountain Life"}
 ],
 lezhe: [
-{
-url: "https://images.unsplash.com/photo-1591280063444-d3c514eb6e13?w=800",
-caption: "Shëngjin Beach",
-alt: "Sandy beach at Shëngjin"
-},
-{
-url: "https://images.unsplash.com/photo-1584646098378-0874589d76b1?w=800",
-caption: "Lezhë Memorial",
-alt: "Skanderbeg Memorial in Lezhë"
-},
-{
-url: "https://images.unsplash.com/photo-1572817519612-d8fadd929b00?w=800",
-caption: "Lezhë Castle Ruins",
-alt: "Historic castle ruins"
-}
+{url:"https://picsum.photos/seed/lezhe1/400/300", caption:"Shëngjin Beach"},
+{url:"https://picsum.photos/seed/lezhe2/400/300", caption:"Skanderbeg Memorial"},
+{url:"https://picsum.photos/seed/lezhe3/400/300", caption:"Castle Ruins"}
 ],
 berat: [
-{
-url: "https://images.unsplash.com/photo-1591280063444-d3c514eb6e13?w=800",
-caption: "Berat Castle",
-alt: "Berat castle on the hill"
-},
-{
-url: "https://images.unsplash.com/photo-1584646098378-0874589d76b1?w=800",
-caption: "City of a Thousand Windows",
-alt: "Classic Berat houses view"
-},
-{
-url: "https://images.unsplash.com/photo-1572817519612-d8fadd929b00?w=800",
-caption: "Osumi River in Berat",
-alt: "River flowing through Berat"
-}
+{url:"https://picsum.photos/seed/berat1/400/300", caption:"Berat Castle"},
+{url:"https://picsum.photos/seed/berat2/400/300", caption:"1000 Windows"},
+{url:"https://picsum.photos/seed/berat3/400/300", caption:"Osumi River"}
 ],
 vlore: [
-{
-url: "https://images.unsplash.com/photo-1591280063444-d3c514eb6e13?w=800",
-caption: "Vlorë Independence Monument",
-alt: "Monument of Independence in Vlorë"
-},
-{
-url: "https://images.unsplash.com/photo-1584646098378-0874589d76b1?w=800",
-caption: "Vlorë Lungomare",
-alt: "Beautiful Vlorë promenade"
-},
-{
-url: "https://images.unsplash.com/photo-1572817519612-d8fadd929b00?w=800",
-caption: "Karaburun Peninsula",
-alt: "Where Adriatic meets Ionian Sea"
-}
+{url:"https://picsum.photos/seed/vlore1/400/300", caption:"Independence Monument"},
+{url:"https://picsum.photos/seed/vlore2/400/300", caption:"Lungomare"},
+{url:"https://picsum.photos/seed/vlore3/400/300", caption:"Karaburun Peninsula"}
 ]
 };
 
@@ -674,30 +523,23 @@ Fun fact:
 Adriatic and Ionian seas meet here.`
 };
 
-/* NEW: Function to display photos */
-function displayCountyPhotos(county) {
+/* SHOW PHOTOS FUNCTION */
+function showPhotos(countyKey) {
 const gallery = document.getElementById('photoGallery');
-const galleryTitle = document.getElementById('galleryTitle');
-const photoContainer = document.getElementById('photoContainer');
+const grid = document.getElementById('photoGrid');
+const photos = countyPhotos[countyKey];
 
-const photos = countyPhotos[county];
-
-if (photos) {
-galleryTitle.textContent = ${county.toUpperCase()} - Photo Gallery;
-photoContainer.innerHTML = '';
-
+if(photos && photos.length > 0) {
+grid.innerHTML = '';
 photos.forEach(photo => {
-const photoDiv = document.createElement('div');
-photoDiv.className = 'photo-item';
-
-photoDiv.innerHTML = `
-<img src="${photo.url}" alt="${photo.alt}" loading="lazy">
-<div class="photo-caption">${photo.caption}</div>
+const div = document.createElement('div');
+div.className = 'photo-item';
+div.innerHTML = `
+<img src="${photo.url}" alt="${photo.caption}" loading="lazy">
+<p>${photo.caption}</p>
 `;
-
-photoContainer.appendChild(photoDiv);
+grid.appendChild(div);
 });
-
 gallery.style.display = 'block';
 } else {
 gallery.style.display = 'none';
@@ -734,8 +576,8 @@ document.getElementById("infoCard").style.display = "block";
 document.getElementById("title").innerText = found.toUpperCase();
 document.getElementById("text").innerText = cityInfo[found];
 
-// Display photos for the county
-displayCountyPhotos(found);
+// Show photos
+showPhotos(found);
 
 document.getElementById("msg").innerText = "";
 }
