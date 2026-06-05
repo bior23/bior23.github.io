@@ -11,6 +11,15 @@ body { font-family: Arial; text-align:center; margin:0; background:#eef6ff; }
 header { background:#2d6cdf; color:white; padding:15px; }
 input, button { padding:10px; margin:5px; }
 #map { height:450px; width:95%; margin:auto; border-radius:10px; }
+
+.card {
+background:white;
+padding:10px;
+margin-top:10px;
+display:inline-block;
+border-radius:10px;
+min-width:250px;
+}
 </style>
 </head>
 
@@ -29,11 +38,21 @@ input, button { padding:10px; margin:5px; }
 
 <div id="map"></div>
 
+<!-- WEATHER CARD -->
+<div class="card" id="weatherCard" style="display:none;">
+<h3 id="cityName"></h3>
+<p id="temp"></p>
+<p id="wind"></p>
+<p id="humidity"></p>
+<p id="desc"></p>
+<p id="advice"></p>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
 
-// 🗺️ MAP
+// 🗺️ MAP (ALWAYS SAFE)
 let map = L.map('map').setView([41.3275,19.8189],8);
 
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
@@ -42,7 +61,7 @@ attribution:'OpenStreetMap'
 
 let marker;
 
-// 🟢 ALBANIA COUNTIES (ONLY THESE ARE ALLOWED)
+// 🇦🇱 ALBANIA COUNTIES ONLY
 const counties = {
 "tirana":[41.3275,19.8189],
 "durres":[41.3246,19.4569],
@@ -58,38 +77,101 @@ const counties = {
 "vlore":[40.4661,19.4914]
 };
 
-// 🔎 SEARCH FUNCTION (case-insensitive + flexible)
+// 🌤️ OPENWEATHER KEY
+const API_KEY = "9de43a81fe7ad37cf116c9b9defe5826";
+
+// 🧠 WEATHER FUNCTION (SAFE)
+function loadWeather(cityName){
+
+fetch(https://api.openweathermap.org/data/2.5/weather?q=${cityName},AL&units=metric&appid=${API_KEY})
+.then(res => res.json())
+.then(data => {
+
+// safety check
+if(!data || !data.main){
+document.getElementById("msg").innerText =
+"Weather not available right now";
+return;
+}
+
+let temp = data.main.temp;
+let wind = data.wind.speed;
+let humidity = data.main.humidity;
+let desc = data.weather[0].description;
+
+// 💡 advice system
+let advice = "";
+
+if(temp >= 30){
+advice = "🔥 Very hot — drink water or coffee & stay in shade!";
+}
+else if(temp >= 22){
+advice = "🌤️ Nice weather — perfect for walking!";
+}
+else if(temp >= 15){
+advice = "🌥️ Mild weather — light jacket recommended.";
+}
+else{
+advice = "🧥 Cold weather — wear warm clothes!";
+}
+
+if(wind >= 8){
+advice += " 🌬️ Strong wind — be careful outside!";
+}
+
+// 📦 show UI
+document.getElementById("weatherCard").style.display = "block";
+
+document.getElementById("cityName").innerText = cityName.toUpperCase();
+document.getElementById("temp").innerText = "🌡️ Temp: " + temp + "°C";
+document.getElementById("wind").innerText = "🌬️ Wind: " + wind + " m/s";
+document.getElementById("humidity").innerText = "💧 Humidity: " + humidity + "%";
+document.getElementById("desc").innerText = "🌤️ " + desc;
+document.getElementById("advice").innerText = advice;
+
+})
+.catch(err=>{
+document.getElementById("msg").innerText =
+"Weather failed — map still works ✔️";
+});
+
+}
+
+// 🔎 MAIN SEARCH FUNCTION
 function searchCity(){
 
 let input = document.getElementById("cityInput").value
 .toLowerCase()
 .trim();
 
-// allow partial match + flexible input
+// find match (flexible typing)
 let found = Object.keys(counties).find(c =>
 input.includes(c)
 );
 
+// ❌ NOT ALBANIA COUNTY
 if(!found){
 document.getElementById("msg").innerText =
-"This place is not in Albania 🇦🇱";
+"This place is not an Albania county 🇦🇱";
 return;
 }
 
 let coords = counties[found];
 
-// 🧹 remove old marker
+// 📍 MAP UPDATE (ALWAYS SAFE)
 if(marker) map.removeLayer(marker);
 
-// 📍 add marker
 marker = L.marker(coords).addTo(map)
 .bindPopup(found.toUpperCase())
 .openPopup();
 
-// 🎯 move map
-map.setView(coords, 10);
+map.setView(coords,10);
 
+// 🧹 clear message
 document.getElementById("msg").innerText = "";
+
+// 🌤️ LOAD WEATHER (CONNECTED)
+loadWeather(found);
 
 }
 
