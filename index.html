@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css"/>
 
 <style>
-body { font-family: Arial; text-align:center; margin:0; }
+body { font-family: Arial; text-align:center; margin:0; background:#eef6ff; }
 header { background:#2d6cdf; color:white; padding:15px; }
 input, button { padding:10px; margin:5px; }
 #map { height:450px; width:95%; margin:auto; border-radius:10px; }
@@ -22,7 +22,7 @@ input, button { padding:10px; margin:5px; }
 
 <br>
 
-<input id="cityInput" placeholder="Enter ANY Albanian place">
+<input id="cityInput" placeholder="Enter Albanian county">
 <button onclick="searchCity()">Search</button>
 
 <p id="msg"></p>
@@ -42,49 +42,54 @@ attribution:'OpenStreetMap'
 
 let marker;
 
-// 🌍 SEARCH FUNCTION (ALL ALBANIA via OpenStreetMap)
+// 🟢 ALBANIA COUNTIES (ONLY THESE ARE ALLOWED)
+const counties = {
+"tirana":[41.3275,19.8189],
+"durres":[41.3246,19.4569],
+"diber":[41.5889,20.2356],
+"shkoder":[42.0685,19.5188],
+"elbasan":[41.1102,20.0823],
+"fier":[40.7239,19.5561],
+"korce":[40.6167,20.7833],
+"gjirokaster":[40.0758,20.1389],
+"kukes":[42.0769,20.4219],
+"lezhe":[41.7861,19.6547],
+"berat":[40.7058,19.9522],
+"vlore":[40.4661,19.4914]
+};
+
+// 🔎 SEARCH FUNCTION (case-insensitive + flexible)
 function searchCity(){
 
-let city = document.getElementById("cityInput").value.trim();
+let input = document.getElementById("cityInput").value
+.toLowerCase()
+.trim();
 
-if(city === ""){
-document.getElementById("msg").innerText = "Enter a place";
-return;
-}
+// allow partial match + flexible input
+let found = Object.keys(counties).find(c =>
+input.includes(c)
+);
 
-// 🔎 OpenStreetMap API
-fetch(https://nominatim.openstreetmap.org/search?format=json&q=${city},Albania)
-.then(res => res.json())
-.then(data => {
-
-if(!data || data.length === 0){
+if(!found){
 document.getElementById("msg").innerText =
 "This place is not in Albania 🇦🇱";
 return;
 }
 
-let place = data[0];
-
-let lat = place.lat;
-let lon = place.lon;
+let coords = counties[found];
 
 // 🧹 remove old marker
 if(marker) map.removeLayer(marker);
 
-// 📍 add new marker
-marker = L.marker([lat, lon]).addTo(map)
-.bindPopup(place.display_name)
+// 📍 add marker
+marker = L.marker(coords).addTo(map)
+.bindPopup(found.toUpperCase())
 .openPopup();
 
 // 🎯 move map
-map.setView([lat, lon], 11);
+map.setView(coords, 10);
 
 document.getElementById("msg").innerText = "";
-
-})
-.catch(err=>{
-document.getElementById("msg").innerText = "Error loading location";
-});
 
 }
 
