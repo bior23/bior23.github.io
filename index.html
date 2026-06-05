@@ -138,6 +138,11 @@ The goal is simple: make learning about Albania easy, modern, and visually enjoy
 <p id="msg"></p>
 
 <div id="map"></div>
+<!-- PHOTO TAB (hidden until selection) -->
+<div id="photoBox" style="display:none; max-width:900px; margin:20px auto; background:white; padding:15px; border-radius:12px; box-shadow:0 10px 20px rgba(0,0,0,0.1);">
+  <h2 id="photoTitle"></h2>
+  <img id="photoImg" style="width:100%; border-radius:10px; margin-top:10px;">
+</div>
 
 <div class="card" id="infoCard">
 <h2 id="title"></h2>
@@ -404,8 +409,28 @@ Fun fact:
 Adriatic and Ionian seas meet here.`
 };
 
+const images = {
+tirana:"https://upload.wikimedia.org/wikipedia/commons/6/6e/Tirana_Skanderbeg_Square.jpg",
+durres:"https://upload.wikimedia.org/wikipedia/commons/0/0d/Durr%C3%ABs_Amphitheatre.jpg",
+diber:"https://upload.wikimedia.org/wikipedia/commons/3/3f/Mount_Korab.jpg",
+shkoder:"https://upload.wikimedia.org/wikipedia/commons/5/5f/Rozafa_Castle.jpg",
+elbasan:"https://upload.wikimedia.org/wikipedia/commons/2/2c/Elbasan_Castle.jpg",
+fier:"https://upload.wikimedia.org/wikipedia/commons/1/1d/Apollonia_Archaeological_Park.jpg",
+korce:"https://upload.wikimedia.org/wikipedia/commons/4/4f/Korce_City.jpg",
+gjirokaster:"https://upload.wikimedia.org/wikipedia/commons/7/7a/Gjirokaster_Castle.jpg",
+kukes:"https://upload.wikimedia.org/wikipedia/commons/9/9f/Kukes_Lake.jpg",
+lezhe:"https://upload.wikimedia.org/wikipedia/commons/4/4a/Shengjin_Beach.jpg",
+berat:"https://upload.wikimedia.org/wikipedia/commons/3/3b/Berat_Castle.jpg",
+vlore:"https://upload.wikimedia.org/wikipedia/commons/2/2f/Vlore_Coast.jpg"
+};
+
 /* SEARCH */
 function searchCity(){
+
+// SHOW PHOTO TAB
+document.getElementById("photoBox").style.display = "block";
+document.getElementById("photoTitle").innerText = found.toUpperCase();
+document.getElementById("photoImg").src = images[found];
 
 let input = normalize(document.getElementById("cityInput").value);
 
