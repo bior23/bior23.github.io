@@ -10,7 +10,7 @@
 body { font-family: Arial; text-align:center; margin:0; }
 header { background:#2d6cdf; color:white; padding:15px; }
 input, button { padding:10px; margin:5px; }
-#map { height:450px; width:95%; margin:auto; }
+#map { height:450px; width:95%; margin:auto; border-radius:10px; }
 </style>
 </head>
 
@@ -33,6 +33,7 @@ input, button { padding:10px; margin:5px; }
 
 <script>
 
+// 🗺️ MAP
 let map = L.map('map').setView([41.3275,19.8189],8);
 
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
@@ -41,16 +42,22 @@ attribution:'OpenStreetMap'
 
 let marker;
 
-// 🌍 REAL SEARCH (ANY PLACE IN ALBANIA)
+// 🌍 SEARCH FUNCTION (ALL ALBANIA via OpenStreetMap)
 function searchCity(){
 
-let city = document.getElementById("cityInput").value;
+let city = document.getElementById("cityInput").value.trim();
 
+if(city === ""){
+document.getElementById("msg").innerText = "Enter a place";
+return;
+}
+
+// 🔎 OpenStreetMap API
 fetch(https://nominatim.openstreetmap.org/search?format=json&q=${city},Albania)
 .then(res => res.json())
 .then(data => {
 
-if(data.length === 0){
+if(!data || data.length === 0){
 document.getElementById("msg").innerText =
 "This place is not in Albania 🇦🇱";
 return;
@@ -58,22 +65,25 @@ return;
 
 let place = data[0];
 
-// 📍 Move map
 let lat = place.lat;
 let lon = place.lon;
 
-map.setView([lat, lon], 12);
-
-// remove old marker
+// 🧹 remove old marker
 if(marker) map.removeLayer(marker);
 
-// add marker
+// 📍 add new marker
 marker = L.marker([lat, lon]).addTo(map)
 .bindPopup(place.display_name)
 .openPopup();
 
+// 🎯 move map
+map.setView([lat, lon], 11);
+
 document.getElementById("msg").innerText = "";
 
+})
+.catch(err=>{
+document.getElementById("msg").innerText = "Error loading location";
 });
 
 }
